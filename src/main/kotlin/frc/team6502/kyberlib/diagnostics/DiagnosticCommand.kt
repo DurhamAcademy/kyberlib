@@ -27,6 +27,6 @@ abstract class DiagnosticCommand(val commandName: String): Command() {
     abstract fun hasPassed(): Boolean
 
     private fun report() {
-        print("[${indexInSuite+1}/$suiteLength] $commandName: ${if(hasPassed()) "PASS" else "FAIL"}")
+        println("[${indexInSuite + 1}/$suiteLength] $commandName: ${if (hasPassed()) "PASS" else "FAIL"}")
     }
 }

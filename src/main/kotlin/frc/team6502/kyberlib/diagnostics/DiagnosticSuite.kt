@@ -12,7 +12,7 @@ class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticComm
             commands[i].setRunWhenDisabled(true)
             addSequential(commands[i])
         }
-        print("Starting diagnostic suite $suiteName")
+        println("Starting diagnostic suite $suiteName")
         start()
     }
 
