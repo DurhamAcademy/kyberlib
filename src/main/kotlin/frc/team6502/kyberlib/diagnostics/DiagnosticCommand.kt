@@ -16,7 +16,9 @@ abstract class DiagnosticCommand(val commandName: String): Command() {
     /**
      * Put any cleanup in here, executed when the command finishes
      */
-    abstract fun cleanup(): Boolean
+    open fun cleanup() {
+
+    }
 
     /**
      * Called after the command completes.
@@ -24,7 +26,7 @@ abstract class DiagnosticCommand(val commandName: String): Command() {
      */
     abstract fun hasPassed(): Boolean
 
-    fun report() {
+    private fun report() {
         print("[${indexInSuite+1}/$suiteLength] $commandName: ${if(hasPassed()) "PASS" else "FAIL"}")
     }
 }
