@@ -17,7 +17,7 @@ class RamseteFollower(path: Path, val b: Double, val zeta: Double) : Follower(pa
         val p = path.getPointAtTime(t)
 
         val k1 = 2 * zeta * sqrt(p.avel.radiansPerSecond.pow(2) + b * p.vel.pow(2))
-        val k2 = b * p.vel
+//        val k2 = b
 
         val v = p.vel * (p.h - pose.h).cos + k1 * ((p.x - pose.x) * pose.h.cos + (p.y - pose.y) * pose.h.sin)
         val av = p.avel.radiansPerSecond + b * p.vel * sinc(p.h - pose.h) * ((p.y - pose.y) * pose.h.cos - (p.x - pose.x) * pose.h.sin) + k1 * (p.h - pose.h).radians

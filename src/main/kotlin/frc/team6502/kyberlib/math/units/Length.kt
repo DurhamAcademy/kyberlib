@@ -12,6 +12,7 @@ class Length(private val _feet: Double) {
     operator fun plus(other: Length) = Length(_feet + other.feet)
     operator fun times(scalar: Double) = Length(_feet * scalar)
     operator fun times(angle: Angle) = angle * this
+    operator fun div(radius: Length) = Angle(_feet / radius.feet)
 
 
 

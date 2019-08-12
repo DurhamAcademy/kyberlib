@@ -51,13 +51,18 @@ class FollowerTest {
         }
 
         if(displayPlot) {
-            figure(2)
+            figure(0)
             plotArrays(dxs, dys, "r", "desired")
             plotArrays(xs, ys, "b", "actual")
             xlabel("x")
             ylabel("y")
             title("path")
-            Thread.sleep(5000)
+        }
+
+        // wait for graph to close
+        Thread.sleep(1000)
+        while (figures.first() != null) {
+            Thread.sleep(1000)
         }
 
         val err = hypot(dys.last()-ys.last(), dxs.last()-xs.last())
@@ -70,7 +75,7 @@ class FollowerTest {
         // generate a quick path
         val p = Path(arrayListOf(Waypoint(0.0,0.0,0.degrees), Waypoint(10.0, 10.0, 0.degrees)), 2.0, 1.0)
 
-        val e = ramsTest(p, 3.0, 0.7)
+        val e = ramsTest(p, 3.0, 0.7, displayPlot = true)
 
         assertTrue(e < 0.1)
     }
@@ -80,7 +85,7 @@ class FollowerTest {
         // generate a quick path
         val p = Path(arrayListOf(Waypoint(0.0,0.0,0.degrees), Waypoint(10.0, 10.0, 0.degrees)), 2.0, 1.0)
 
-        val e = ramsTest(p, 3.0, 0.7, false, 3.0)
+        val e = ramsTest(p, 3.0, 0.7, true, 3.0)
 
         assertTrue(e < 0.1)
 
