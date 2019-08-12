@@ -25,7 +25,7 @@ class Path(val waypoints: ArrayList<Waypoint>, val cruiseVelocity: Double, val a
         println("TOTAL LENGTH: $length")
         trapezoidalProfile = TrapezoidalProfile(length, cruiseVelocity, acceleration)
         println(trapezoidalProfile)
-        val csvWriter = CSVWriter("/home/co/path.csv")
+//        val csvWriter = CSVWriter(/"/home/co/path.csv")
         var distanceTraversed = 0.0
         var lastH = waypoints[0].h
         for (i in 0..(trapezoidalProfile.endTime / 0.02).toInt()) {
@@ -37,7 +37,7 @@ class Path(val waypoints: ArrayList<Waypoint>, val cruiseVelocity: Double, val a
 //            println(omega)
 //            println(omega.radiansPerSecond.radiansPerSecond)
             trajectory.add(TrajectoryPoint(t, pos.x.rtf, pos.y.rtf, pos.h.radians.rtf.radians, vel.rtf, omega.rtf.radiansPerSecond))
-            csvWriter.write(CSVField("time", t.rtf), pos, CSVField("velocity", vel), CSVField("avel", omega), CSVField("distance", distanceTraversed))
+//            csvWriter.write(CSVField("time", t.rtf), pos, CSVField("velocity", vel), CSVField("avel", omega), CSVField("distance", distanceTraversed))
             lastH = pos.h
         }
         println(distanceTraversed)

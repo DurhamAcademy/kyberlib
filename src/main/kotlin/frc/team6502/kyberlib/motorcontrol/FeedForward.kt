@@ -1,7 +1,5 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import jdk.jfr.Percentage
-
 interface KFeedForward {
     fun percentAt(value: Double): Double
 }

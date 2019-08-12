@@ -51,7 +51,7 @@ class FollowerTest {
         }
 
         if(displayPlot) {
-            figure(0)
+            figure(2)
             plotArrays(dxs, dys, "r", "desired")
             plotArrays(xs, ys, "b", "actual")
             xlabel("x")
@@ -85,7 +85,7 @@ class FollowerTest {
         // generate a quick path
         val p = Path(arrayListOf(Waypoint(0.0,0.0,0.degrees), Waypoint(10.0, 10.0, 0.degrees)), 2.0, 1.0)
 
-        val e = ramsTest(p, 3.0, 0.7, true, 3.0)
+        val e = ramsTest(p, 3.0, 0.7, false, 3.0)
 
         assertTrue(e < 0.1)
 
