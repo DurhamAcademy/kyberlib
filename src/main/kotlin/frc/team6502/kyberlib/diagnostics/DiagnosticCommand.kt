@@ -1,16 +1,25 @@
 package frc.team6502.kyberlib.diagnostics
 
-import edu.wpi.first.wpilibj.command.Command
-import edu.wpi.first.wpilibj.command.CommandGroup
+import edu.wpi.first.wpilibj.frc2.command.SendableCommandBase
 
-abstract class DiagnosticCommand(val commandName: String): Command() {
+abstract class DiagnosticCommand(val commandName: String) : SendableCommandBase() {
 
     var indexInSuite = 0
     var suiteLength = 1
+    var executed = false
 
-    override fun end() {
-        cleanup()
-        report()
+    init {
+        name = commandName
+    }
+
+
+    final override fun end(interrupted: Boolean) {
+        if (!interrupted) {
+            executed = true
+            report()
+            if (!hasPassed()) Diagnostics.cancel()
+            cleanup()
+        }
     }
 
     /**
@@ -27,6 +36,6 @@ abstract class DiagnosticCommand(val commandName: String): Command() {
     abstract fun hasPassed(): Boolean
 
     private fun report() {
-        println("[${indexInSuite + 1}/$suiteLength] $commandName: ${if (hasPassed()) "PASS" else "FAIL"}")
+        println(" ${if (indexInSuite == 0) '┌' else '├'} [${if (hasPassed()) "\u001b[32mPASS\u001B[0m" else "\u001b[31mFAIL\u001B[0m"}] $commandName (${indexInSuite + 1}/$suiteLength)")
     }
 }
