@@ -60,7 +60,7 @@ class FollowerTest {
         }
 
         // wait for graph to close
-        Thread.sleep(1000)
+        Thread.sleep(5000)
         while (figures.first() != null) {
             Thread.sleep(1000)
         }

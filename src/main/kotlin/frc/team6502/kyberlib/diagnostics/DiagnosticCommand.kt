@@ -35,6 +35,9 @@ abstract class DiagnosticCommand(val commandName: String) : SendableCommandBase(
      */
     abstract fun hasPassed(): Boolean
 
+    /**
+     * Reports the command's status
+     */
     private fun report() {
         println(" ${if (indexInSuite == 0) '┌' else '├'} [${if (hasPassed()) "\u001b[32mPASS\u001B[0m" else "\u001b[31mFAIL\u001B[0m"}] $commandName (${indexInSuite + 1}/$suiteLength)")
     }

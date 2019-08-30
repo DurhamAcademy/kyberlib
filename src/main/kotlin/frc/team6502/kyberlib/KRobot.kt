@@ -10,20 +10,21 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow
 import frc.team6502.kyberlib.diagnostics.Diagnostics
 
 operator fun CommandGroupBase.plusAssign(cmd: Command) {
-    println(cmd.name)
     addCommands(cmd)
 }
 
 open class KRobot(period: Double = 0.02) : TimedRobot(period) {
 
+    final override fun testPeriodic() {}
+    final override fun autonomousPeriodic() { aLoop() }
+    final override fun autonomousInit() { aInit() }
+    final override fun teleopInit() { tInit() }
+    final override fun disabledPeriodic() { dLoop() }
+    final override fun teleopPeriodic() { tLoop() }
 
     final override fun robotInit() {
         HAL.report(FRCNetComm.tResourceType.kResourceType_Language, 6)
         rInit()
-    }
-
-    override fun loopFunc() {
-        super.loopFunc()
     }
 
     final override fun robotPeriodic() {
@@ -36,41 +37,48 @@ open class KRobot(period: Double = 0.02) : TimedRobot(period) {
         Diagnostics.schedule()
     }
 
-    final override fun testPeriodic() {
-
-    }
-
-    final override fun autonomousPeriodic() {
-        aLoop()
-    }
-
-    final override fun autonomousInit() {
-        aInit()
-    }
-
-    final override fun teleopInit() {
-        tInit()
-    }
-
     final override fun disabledInit() {
         Diagnostics.cancel()
         dInit()
     }
 
-    final override fun disabledPeriodic() {
-        dLoop()
-    }
-
-    final override fun teleopPeriodic() {
-        tLoop()
-    }
-
+    /**
+     * Executed on boot. Initialize subsystems here.
+     */
     open fun rInit() {}
+
+    /**
+     * Always executed repeatedly. Do not run the scheduler here, it is internally called.
+     */
     open fun rLoop() {}
+
+    /**
+     * Executed when the robot moves to a disabled state, including on boot.
+     */
     open fun dInit() {}
+
+    /**
+     * Executed constantly when the robot is disabled.
+     */
     open fun dLoop() {}
+
+    /**
+     * Executed at the beginning of autonomous.
+     */
     open fun aInit() {}
+
+    /**
+     * Executed constantly during autonomous.
+     */
     open fun aLoop() {}
+
+    /**
+     * Executed at the beginning of teleop.
+     */
     open fun tInit() {}
+
+    /**
+     * Executed constantly during teleop.
+     */
     open fun tLoop() {}
 }
