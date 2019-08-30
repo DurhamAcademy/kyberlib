@@ -8,6 +8,9 @@ class LinearVelocity(private val _feetPerSecond: Double) {
 
     val feetPerSecond get() = _feetPerSecond
 
+    operator fun div(other: Length) = AngularVelocity(_feetPerSecond / other.feet)
+
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
