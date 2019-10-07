@@ -1,18 +1,33 @@
 package frc.team6502.kyberlib.motorcontrol
 
 interface KFeedForward {
-    fun percentAt(value: Double): Double
+    fun voltageAt(setpoint: Double, current: Double): Double
 }
 
-class KConstantFeedForward(private val percentage: Double) : KFeedForward {
-    override fun percentAt(value: Double) = percentage
+/**
+ * A feedforward which always applies a constant voltage
+ */
+class KConstantFeedForward(private val voltage: Double) : KFeedForward {
+    override fun voltageAt(setpoint: Double, current: Double) = voltage
 }
 
+/**
+ * A feedforward which uses an arbitrary user-defined lambda to process inputs.
+ * Units are radians, feet, and per second in the case of velocity
+ */
+class KCustomFeedForward(private val f: (setpoint: Double, current: Double) -> Double): KFeedForward{
+    override fun voltageAt(setpoint: Double, current: Double) = f(setpoint, current)
+}
+
+/**
+ * A feedforward which applies velocity characterization for a mechanism like a drivetrain
+ * It follows the formula V = kV * setpoint(ft/s or rad/s) +/- intercept
+ */
 class KCharacterizedFeedForward(private val kV: Double, private val intercept: Double) : KFeedForward {
-    override fun percentAt(value: Double): Double {
+    override fun voltageAt(setpoint: Double, current: Double): Double {
         return when {
-            value > 0.0 -> (kV * value + intercept) / 12.0
-            value < 0.0 -> (kV * value - intercept) / 12.0
+            setpoint > 0.0 -> (kV * setpoint + intercept)
+            setpoint < 0.0 -> (kV * setpoint - intercept)
             else -> 0.0
         }
     }

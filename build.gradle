@@ -37,7 +37,7 @@ publishing {
         maven(MavenPublication){
             groupId = 'frc.team6502'
             artifactId = 'kyberlib'
-            version = '2019.8.22.11'
+            version = '2019.9.26'
 
             from components.java
         }

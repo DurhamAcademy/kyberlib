@@ -8,12 +8,17 @@ import edu.wpi.first.wpilibj.frc2.command.CommandGroupBase
 import edu.wpi.first.wpilibj.frc2.command.CommandScheduler
 import edu.wpi.first.wpilibj.livewindow.LiveWindow
 import frc.team6502.kyberlib.diagnostics.Diagnostics
+import koma.diag
 
 operator fun CommandGroupBase.plusAssign(cmd: Command) {
     addCommands(cmd)
 }
 
 open class KRobot(period: Double = 0.02) : TimedRobot(period) {
+
+    companion object {
+        internal var diagnostics: Diagnostics? = null
+    }
 
     final override fun testPeriodic() {}
     final override fun autonomousPeriodic() { aLoop() }
@@ -32,13 +37,20 @@ open class KRobot(period: Double = 0.02) : TimedRobot(period) {
         rLoop()
     }
 
+    open fun diagnostics(diagnostics: Diagnostics) {
+
+    }
+
     final override fun testInit() {
         LiveWindow.setEnabled(false)
-        Diagnostics.schedule()
+        diagnostics = Diagnostics()
+        diagnostics(diagnostics!!)
+        diagnostics!!.schedule()
     }
 
     final override fun disabledInit() {
-        Diagnostics.cancel()
+        diagnostics?.cancel()
+        diagnostics = null
         dInit()
     }
 

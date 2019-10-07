@@ -10,6 +10,8 @@ interface KMotorController {
     var kP: Double
     var kI: Double
     var kD: Double
+    var brake: Boolean
+    var feedForward: KFeedForward?
     var positionSetpoint: Angle
     var position: Angle
     var linearPositionSetpoint: Length
