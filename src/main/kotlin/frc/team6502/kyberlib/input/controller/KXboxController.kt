@@ -5,6 +5,9 @@ import edu.wpi.first.wpilibj.frc2.buttons.JoystickButton
 import frc.team6502.kyberlib.input.KAxis
 import frc.team6502.kyberlib.input.KController
 
+/**
+ * A Wrapper for a generic Xbox controller
+ */
 class KXboxController(port: Int): KController(port){
     val leftX = KAxis { joystick.getX(GenericHID.Hand.kLeft) }
     val leftY = KAxis { joystick.getY(GenericHID.Hand.kLeft) }
