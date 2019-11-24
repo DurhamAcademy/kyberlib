@@ -55,7 +55,7 @@ open class KRobot(period: Double = 0.02) : TimedRobot(period) {
     }
 
     /**
-     * Executed on boot. Initialize subsystems here.
+     * Executed on boot. Initialize subsystems here. (dont)
      */
     open fun rInit() {}
 

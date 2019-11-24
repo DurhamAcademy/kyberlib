@@ -4,23 +4,19 @@ import com.revrobotics.*
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
 import frc.team6502.kyberlib.math.units.*
 
-enum class SoftwarePIDMode {
-    DISABLED,
-    POSITION,
-    VELOCITY
-}
+class KSparkMax(val canId: Int, val type: MotorType, apply: KSparkMax.() -> Unit) : KMotorController {
 
-class KSparkMax(val canId: Int, val mtype: MotorType) : KMotorController {
 
-    var radius: Length? = null
 
-    private val _spark = CANSparkMax(canId, mtype)
+    private val _spark = CANSparkMax(canId, type)
     private var _enc: CANEncoder? = null
     private val _pid = _spark.pidController
 
 
+
+
     fun configEncoder(type: EncoderType, cpr: Int, reverse: Boolean) {
-        if(mtype == MotorType.kBrushless) {
+        if(this.type == MotorType.kBrushless) {
             _enc = _spark.encoder
         } else {
             _enc = _spark.getEncoder(type, cpr)
@@ -30,9 +26,10 @@ class KSparkMax(val canId: Int, val mtype: MotorType) : KMotorController {
 
     init {
         _spark.restoreFactoryDefaults()
-        if (mtype == MotorType.kBrushless) {
+        if (type == MotorType.kBrushless) {
             configEncoder(EncoderType.kHallSensor, 0, false)
         }
+        this.apply(apply)
     }
 
     var inverted: Boolean
@@ -89,20 +86,20 @@ class KSparkMax(val canId: Int, val mtype: MotorType) : KMotorController {
     override var position: Angle
         get() = _enc!!.position.rotations
         set(value) {
-            positionSetpoint = value
+            positionSetpoint = value * gearRatio
         }
 
     override var linearPositionSetpoint = 0.feet
         set(value) {
             requireNotNull(radius) { "Cannot set motor controller linearPosition without a defined radius" }
-            positionSetpoint = value / radius!!
+            positionSetpoint = (value * gearRatio) / radius!!
             field = value
         }
 
     override var linearPosition: Length
         get() {
             requireNotNull(radius) { "Cannot get motor controller linearPosition without a defined radius" }
-            return _enc!!.position.rotations.times(radius!!)
+            return _enc!!.position.rotations.times(radius!!) * (1/gearRatio)
         }
         set(value) {
             linearPositionSetpoint = value
@@ -110,12 +107,12 @@ class KSparkMax(val canId: Int, val mtype: MotorType) : KMotorController {
 
     override var velocitySetpoint: AngularVelocity = 0.rpm
         set(value) {
-            _pid.setReference(value.rpm, ControlType.kVelocity)
+            _pid.setReference(value.rpm * gearRatio, ControlType.kVelocity)
             field = value
         }
 
     override var velocity: AngularVelocity
-        get() = _enc!!.velocity.rpm
+        get() = _enc!!.velocity.rpm / gearRatio
         set(value) {
             velocitySetpoint = value
         }
@@ -136,54 +133,3 @@ class KSparkMax(val canId: Int, val mtype: MotorType) : KMotorController {
         }
 
 }
-
-class KSparkMaxBuilder(id: Int, type: MotorType) {
-
-    val s = KSparkMax(id, type)
-
-    /**
-     * Configures an external encoder. NEO internal encoders are automatically assumed if the motor type is brushless.
-     * [sensorType] determines if the sensor is hall, quadrature, or analog, and [cpr] is the sensor's counts per revolution.
-     */
-    fun encoder(sensorType: EncoderType, cpr: Int, reverse: Boolean) {
-        require(s.mtype != MotorType.kBrushless) { "Brushless motors must use their integrated encoder" }
-        s.configEncoder(sensorType, cpr, reverse)
-    }
-    /**
-     * Sets [kP], [kI], and [kD] gains for the motor controller
-     */
-    fun pid(kP: Double, kI: Double, kD: Double) {
-        s.kP = kP
-        s.kI = kI
-        s.kD = kD
-    }
-
-    /**
-     * Sets the output radius for the motor. Used to set distance instead of position
-     */
-    fun radius(r: Length) {
-        s.radius = r
-    }
-
-    fun invert(i: Boolean) {
-        s.inverted = i
-    }
-
-    fun brake(){
-        s.brake = true
-    }
-
-    fun ff(feedForward: KFeedForward){
-        s.feedForward = feedForward
-    }
-
-    fun build(): KSparkMax {
-        return s
-    }
-
-}
-
-fun sparkmax(id: Int, type: MotorType, init: KSparkMaxBuilder.() -> Unit): KSparkMax {
-    return KSparkMaxBuilder(id, type).apply(init).build()
-}
-
