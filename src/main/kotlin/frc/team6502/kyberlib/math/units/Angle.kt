@@ -18,11 +18,18 @@ class Angle(private val _radians: Double) {
     }
 
     operator fun plus(other: Angle) = Angle(_radians + other.radians)
+
+    // Shortest distance
     operator fun minus(other: Angle): Angle {
         val diff = (_radians - other.radians + PI) % TAU - PI
         return Angle(if(diff < -PI) diff + TAU else diff)
     }
+
+    // Arc Length
     operator fun times(other: Length) = other * _radians
+
+    // Scalar
+    operator fun times(other: Double) = Angle(_radians * other)
 
     val sin get() = kotlin.math.sin(_radians)
     val cos get() = kotlin.math.cos(_radians)

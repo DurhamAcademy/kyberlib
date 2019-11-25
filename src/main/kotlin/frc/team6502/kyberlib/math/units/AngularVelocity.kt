@@ -15,6 +15,7 @@ class AngularVelocity(private val _radiansPerSecond: Double) {
     }
 
     operator fun times(other: Length) = LinearVelocity(other.feet * _radiansPerSecond)
+    operator fun times(other: Double) = AngularVelocity(other * _radiansPerSecond)
 
     val radiansPerSecond get() = _radiansPerSecond
     val degreesPerSecond get() = _radiansPerSecond / DEGREES_TO_RADIANS

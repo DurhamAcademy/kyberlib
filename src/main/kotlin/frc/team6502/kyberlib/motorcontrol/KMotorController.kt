@@ -1,6 +1,9 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.Notifier
+import frc.team6502.kyberlib.CANId
+import frc.team6502.kyberlib.CANKey
+import frc.team6502.kyberlib.CANRegistry
 import frc.team6502.kyberlib.math.units.Angle
 import frc.team6502.kyberlib.math.units.AngularVelocity
 import frc.team6502.kyberlib.math.units.Length
@@ -13,13 +16,22 @@ const val FOLLOW_PERIOD = 0.02
 
 enum class EncoderType {
     NONE,
-    HALL,
-    CTRE_MAG
+    NEO_HALL,
+    QUADRATURE
 }
 
-data class KEncoderConfig(val cpr: Int, val type: EncoderType)
+enum class MotorType {
+    BRUSHLESS,
+    BRUSHED
+}
 
-abstract class KMotorController: KBasicMotorController() {
+data class KEncoderConfig(val cpr: Int, val type: EncoderType, val reversed: Boolean = false)
+
+abstract class KMotorController(val canId: CANId, val motorType: MotorType, apply: KMotorController.() -> Unit): KBasicMotorController() {
+
+    init {
+        this.apply(apply)
+    }
 
     // Status of various configurable properties
     private var linearConfigured = false
@@ -31,6 +43,13 @@ abstract class KMotorController: KBasicMotorController() {
     var feedForward: KFeedForward? = null
 
     var encoderConfig: KEncoderConfig = KEncoderConfig(0, EncoderType.NONE)
+    set(value) {
+        if(configureEncoder(value)) {
+            field = value
+        } else {
+            System.err.println("Invalid encoder configuration")
+        }
+    }
 
     var radius: Length? = null
         set(value) {
@@ -55,7 +74,7 @@ abstract class KMotorController: KBasicMotorController() {
             field = value
             updatePIDGains(kP, kI, kD)
         }
-    
+
     abstract var positionSetpoint: Angle
     abstract var position: Angle
     abstract var linearPositionSetpoint: Length
@@ -88,4 +107,6 @@ abstract class KMotorController: KBasicMotorController() {
      * Makes all followers follow the master
      */
     internal abstract fun updateFollowers()
+
+    internal abstract fun configureEncoder(config: KEncoderConfig): Boolean
 }

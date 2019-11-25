@@ -2,70 +2,66 @@ package frc.team6502.kyberlib.motorcontrol
 
 import com.revrobotics.*
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
+import frc.team6502.kyberlib.CANId
 import frc.team6502.kyberlib.math.units.*
+import frc.team6502.kyberlib.motorcontrol.MotorType.*
 
-class KSparkMax(val canId: Int, val type: MotorType, apply: KSparkMax.() -> Unit) : KMotorController {
+class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit): KMotorController(canId, motorType, apply) {
+    override fun updatePIDGains(kP: Double, kI: Double, kD: Double) {
+        _pid.p = kP
+        _pid.i = kI
+        _pid.d = kD
+    }
 
+    override fun updateFollowers() {
+        for(follower in followers){
+            follower.percentOutput = _spark.appliedOutput * if(follower.reversed != reversed) -1.0 else 1.0
+        }
+    }
 
+    override fun setBrakeMode(brakeMode: BrakeMode) {
+        _spark.idleMode = when(brakeMode){
+            true -> CANSparkMax.IdleMode.kBrake
+            false -> CANSparkMax.IdleMode.kCoast
+        }
+    }
 
-    private val _spark = CANSparkMax(canId, type)
+    override fun setReversed(reversed: Boolean) {
+        _spark.inverted = reversed
+    }
+
+    override fun configureEncoder(config: KEncoderConfig): Boolean {
+        return when {
+            config.type == EncoderType.NEO_HALL && motorType == BRUSHLESS -> {
+                _enc = _spark.encoder
+                _enc?.inverted = config.reversed
+                true
+            }
+            config.type == EncoderType.QUADRATURE && motorType == BRUSHED -> {
+                _enc = _spark.getEncoder(com.revrobotics.EncoderType.kQuadrature, config.cpr)
+                _enc?.inverted = config.reversed
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+    private val _spark = CANSparkMax(canId, when(motorType) {
+        BRUSHLESS -> MotorType.kBrushless
+        BRUSHED -> MotorType.kBrushed
+    })
     private var _enc: CANEncoder? = null
     private val _pid = _spark.pidController
 
-
-
-
-    fun configEncoder(type: EncoderType, cpr: Int, reverse: Boolean) {
-        if(this.type == MotorType.kBrushless) {
-            _enc = _spark.encoder
-        } else {
-            _enc = _spark.getEncoder(type, cpr)
-            if (reverse) _enc?.inverted = true
-        }
-    }
-
     init {
         _spark.restoreFactoryDefaults()
-        if (type == MotorType.kBrushless) {
-            configEncoder(EncoderType.kHallSensor, 0, false)
+
+        if(motorType == BRUSHLESS) {
+            encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
         }
-        this.apply(apply)
     }
-
-    var inverted: Boolean
-        get() = _spark.inverted
-        set(value) {
-            _spark.inverted = value
-        }
-
-    override var feedForward: KFeedForward? = null
-
-    override var kP: Double
-        get() = _pid.p
-        set(value) {
-            _pid.p = value
-        }
-
-    override var kI: Double
-        get() = _pid.i
-        set(value) {
-            _pid.i = value
-        }
-
-    override var kD: Double
-        get() = _pid.d
-        set(value) {
-            _pid.d = value
-        }
-
-    override var brake: Boolean
-        get() = _spark.idleMode == CANSparkMax.IdleMode.kBrake
-        set(value) {
-            _spark.idleMode = when(value) {
-                true -> CANSparkMax.IdleMode.kBrake
-                false -> CANSparkMax.IdleMode.kCoast
-            }
-        }
 
     override var percentOutput: Double
         get() = _spark.appliedOutput
@@ -112,7 +108,7 @@ class KSparkMax(val canId: Int, val type: MotorType, apply: KSparkMax.() -> Unit
         }
 
     override var velocity: AngularVelocity
-        get() = _enc!!.velocity.rpm / gearRatio
+        get() = _enc!!.velocity.rpm * (1/gearRatio)
         set(value) {
             velocitySetpoint = value
         }
