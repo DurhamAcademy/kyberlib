@@ -1,12 +1,18 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import com.revrobotics.*
+import com.revrobotics.CANEncoder
+import com.revrobotics.CANPIDController
+import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
+import com.revrobotics.ControlType
 import frc.team6502.kyberlib.CANId
+import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
-import frc.team6502.kyberlib.motorcontrol.MotorType.*
+import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
+import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
 
-class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit): KMotorController(canId, motorType, apply) {
+class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController(canId, motorType, apply) {
+
     override fun updatePIDGains(kP: Double, kI: Double, kD: Double) {
         _pid.p = kP
         _pid.i = kI
@@ -14,13 +20,13 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
     }
 
     override fun updateFollowers() {
-        for(follower in followers){
-            follower.percentOutput = _spark.appliedOutput * if(follower.reversed != reversed) -1.0 else 1.0
+        for (follower in followers) {
+            follower.percentOutput = _spark.appliedOutput.invertIf { follower.reversed != this.reversed }
         }
     }
 
     override fun setBrakeMode(brakeMode: BrakeMode) {
-        _spark.idleMode = when(brakeMode){
+        _spark.idleMode = when (brakeMode) {
             true -> CANSparkMax.IdleMode.kBrake
             false -> CANSparkMax.IdleMode.kCoast
         }
@@ -48,7 +54,7 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
         }
     }
 
-    private val _spark = CANSparkMax(canId, when(motorType) {
+    private val _spark = CANSparkMax(canId, when (motorType) {
         BRUSHLESS -> MotorType.kBrushless
         BRUSHED -> MotorType.kBrushed
     })
@@ -58,7 +64,7 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
     init {
         _spark.restoreFactoryDefaults()
 
-        if(motorType == BRUSHLESS) {
+        if (motorType == BRUSHLESS) {
             encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
         }
     }
@@ -71,8 +77,9 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
 
     override var positionSetpoint = 0.radians
         set(value) {
-            if(feedForward != null) {
-                _pid.setReference(value.rotations, ControlType.kPosition, 0, feedForward?.voltageAt(value.radians, position.radians) ?: 0.0, CANPIDController.ArbFFUnits.kVoltage)
+            if (feedForward != null) {
+                _pid.setReference(value.rotations, ControlType.kPosition, 0, feedForward?.voltageAt(value.radians, position.radians)
+                        ?: 0.0, CANPIDController.ArbFFUnits.kVoltage)
             } else {
                 _pid.setReference(value.rotations, ControlType.kPosition)
             }
@@ -95,7 +102,7 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
     override var linearPosition: Length
         get() {
             requireNotNull(radius) { "Cannot get motor controller linearPosition without a defined radius" }
-            return _enc!!.position.rotations.times(radius!!) * (1/gearRatio)
+            return _enc!!.position.rotations.times(radius!!) * (1 / gearRatio)
         }
         set(value) {
             linearPositionSetpoint = value
@@ -108,7 +115,7 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
         }
 
     override var velocity: AngularVelocity
-        get() = _enc!!.velocity.rpm * (1/gearRatio)
+        get() = _enc!!.velocity.rpm * (1 / gearRatio)
         set(value) {
             velocitySetpoint = value
         }

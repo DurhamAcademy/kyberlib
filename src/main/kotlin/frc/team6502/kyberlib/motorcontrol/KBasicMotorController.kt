@@ -1,5 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
+import frc.team6502.kyberlib.CANId
+
 abstract class KBasicMotorController {
 
     var brakeMode: BrakeMode = false
