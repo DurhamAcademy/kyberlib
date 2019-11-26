@@ -1,6 +1,6 @@
 package frc.team6502.kyberlib.diagnostics
 
-import edu.wpi.first.wpilibj.frc2.command.SequentialCommandGroup
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team6502.kyberlib.plusAssign
 
 

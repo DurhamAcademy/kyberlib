@@ -40,8 +40,7 @@ internal class AngularVelocityTest {
 
     @Test
     fun times() {
-        assertEquals(60.rpm * 6.inches, (0.5*PI).feetPerSecond)
-        assertEquals(180.degrees * 6.inches, 3.inches * PI)
+        assertEquals(60.rpm * 6.inches, (PI).feetPerSecond)
     }
 
 

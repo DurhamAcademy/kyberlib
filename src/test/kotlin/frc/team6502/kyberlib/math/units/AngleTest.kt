@@ -53,8 +53,8 @@ internal class AngleTest {
 
     @Test
     fun times() {
-        assertEquals(360.degrees * 6.inches, 6.inches * PI)
-        assertEquals(180.degrees * 6.inches, 3.inches * PI)
+        assertEquals(360.degrees * 6.inches, 6.inches * TAU)
+        assertEquals(180.degrees * 6.inches, 3.inches * TAU)
     }
 
 

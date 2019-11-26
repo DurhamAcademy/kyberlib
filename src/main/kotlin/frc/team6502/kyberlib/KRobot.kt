@@ -3,12 +3,11 @@ package frc.team6502.kyberlib
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL
 import edu.wpi.first.wpilibj.TimedRobot
-import edu.wpi.first.wpilibj.frc2.command.Command
-import edu.wpi.first.wpilibj.frc2.command.CommandGroupBase
-import edu.wpi.first.wpilibj.frc2.command.CommandScheduler
 import edu.wpi.first.wpilibj.livewindow.LiveWindow
+import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.CommandGroupBase
+import edu.wpi.first.wpilibj2.command.CommandScheduler
 import frc.team6502.kyberlib.diagnostics.Diagnostics
-import koma.diag
 
 operator fun CommandGroupBase.plusAssign(cmd: Command) {
     addCommands(cmd)

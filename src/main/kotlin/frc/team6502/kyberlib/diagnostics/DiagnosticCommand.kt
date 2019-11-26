@@ -1,10 +1,10 @@
 package frc.team6502.kyberlib.diagnostics
 
 import edu.wpi.first.wpilibj.Timer
-import edu.wpi.first.wpilibj.frc2.command.SendableCommandBase
+import edu.wpi.first.wpilibj2.command.CommandBase
 import frc.team6502.kyberlib.KRobot
 
-abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 0.0) : SendableCommandBase() {
+abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 0.0): CommandBase() {
 
     internal lateinit var suite: DiagnosticSuite
     var indexInSuite = 0

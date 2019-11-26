@@ -1,7 +1,7 @@
 package frc.team6502.kyberlib.input.controller
 
 import edu.wpi.first.wpilibj.GenericHID
-import edu.wpi.first.wpilibj.frc2.buttons.JoystickButton
+import edu.wpi.first.wpilibj2.command.button.JoystickButton
 import frc.team6502.kyberlib.input.KAxis
 import frc.team6502.kyberlib.input.KController
 
