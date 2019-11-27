@@ -1,16 +1,17 @@
-# kyberlib
-Standard libraries for FRC team 6502 for 2020 and beyond.
+<img width="50%" src="https://6502.team/img/external/kyber-dark.png">
+DARC SIDE's standard FRC libraries for 2020 and beyond.
 
-# Planned Features
-- Motor Controller DSL for simplified construction along with an easy-to-use wrapper for many ESCs. `IN-PROGRESS`
-```kotlin
-val spark = sparkmax(0,MotorType.kBrushless) {
-    pid(0.0, 0.0, 0.0)
-    reverse(true)            
-    ...
-}
-```
-- Unit conversions and generic measurement types (Angle, Length, etc.) `IN-PROGRESS`
-- Path generation and followers `IN-PROGRESS`
-- Logging and dashboard wrapper
-- Repurpose test mode for automatic diagnostics (like unit testing physical mechanisms) `✓`
+<br>
+
+# Features
+
+<img width="30%" src="https://6502.team/img/external/speedcontrol.png">
+Kyberlib provides unified ESC wrappers with consistent Kotlin-style API calls. Have you ever wanted a Victor SPX to follow a Spark MAX? Now you can. Also, gone are the days of CAN IDs. Kyberlib allows you to store device IDs in a central registry, and will automatically look them up when declaring motor controllers by a device name.
+<br>
+<img width="30%" src="https://6502.team/img/external/unitconversion.png">
+Kyberlib allows for conversion between units of distance, angle, velocity, and more. All without messy function calls. For example, 4.feet.inches => 48. It also includes some useful operators, like finding the shortest route between two angles.
+
+## More coming soon, including
+- Limelight wrapper
+- Automatic WPILib motion profile regeneration
+- LED animation profiles using the new AddressableLED class
