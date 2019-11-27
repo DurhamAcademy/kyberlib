@@ -10,6 +10,9 @@ Kyberlib provides unified ESC wrappers with consistent Kotlin-style API calls. H
 <br><br>
 <img width="30%" src="https://6502.team/img/external/unitconversion.png">
 Kyberlib allows for conversion between units of distance, angle, velocity, and more. All without messy function calls. For example, 4.feet.inches => 48. It also includes some useful operators, like finding the shortest route between two angles.
+<br>
+<img width="30%" src="https://6502.team/img/external/diagnostics.png">
+Your team has made it to the last tiebreaker match of finals, but when the match begins you realize that a cable for your intake wasn't plugged back in after some routine maintenance, rendering your robot unusable. With Kyberlib's diagnostic tools, you can write automated tests for mechanisms that can be executed in queue before each and every match to prevent this very scenario. It's like unit testing, but for actual hardware. The diagnostic framework is built on WPILib's command-based architecture, so writing them is already familiar.
 
 ## More coming soon, including
 - Limelight wrapper
