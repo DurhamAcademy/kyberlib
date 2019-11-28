@@ -1,7 +1,6 @@
 package frc.team6502.kyberlib.math.units
 
 import kotlin.math.PI
-import kotlin.math.abs
 import kotlin.math.absoluteValue
 
 val Number.radians get() = Angle(toDouble())
@@ -11,18 +10,25 @@ fun Number.encoderAngle(cpr: Int) = (toDouble() / (cpr * 4.0)).rotations
 
 const val TAU = 2 * PI
 
-class Angle(private val _radians: Double) {
+data class Angle(private val _radians: Double) {
     companion object {
         const val DEGREES_TO_RADIANS = PI / 180.0
         const val ROTATIONS_TO_RADIANS = PI * 2.0
     }
 
     operator fun plus(other: Angle) = Angle(_radians + other.radians)
+
+    // Shortest distance
     operator fun minus(other: Angle): Angle {
         val diff = (_radians - other.radians + PI) % TAU - PI
         return Angle(if(diff < -PI) diff + TAU else diff)
     }
+
+    // Arc Length
     operator fun times(other: Length) = other * _radians
+
+    // Scalar
+    operator fun times(other: Double) = Angle(_radians * other)
 
     val sin get() = kotlin.math.sin(_radians)
     val cos get() = kotlin.math.cos(_radians)
@@ -33,22 +39,16 @@ class Angle(private val _radians: Double) {
     val rotations get() = _radians / Angle.ROTATIONS_TO_RADIANS
     fun encoderAngle(cpr: Int) = rotations * (cpr * 4.0)
 
-    override fun toString() = "$degrees deg"
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
         other as Angle
 
-        if (abs(_radians - other._radians) > 0.0001) return false
-
-        return true
+        return (_radians - other._radians).absoluteValue < 0.01
     }
 
     override fun hashCode(): Int {
         return _radians.hashCode()
     }
-
-
 }

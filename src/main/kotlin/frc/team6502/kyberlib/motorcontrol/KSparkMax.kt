@@ -1,120 +1,137 @@
 package frc.team6502.kyberlib.motorcontrol
 
+import com.revrobotics.CANEncoder
+import com.revrobotics.CANPIDController
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
 import com.revrobotics.ControlType
-import com.revrobotics.SensorType
-import edu.wpi.first.wpilibj.CounterBase
-import edu.wpi.first.wpilibj.Encoder
-import edu.wpi.first.wpilibj.Notifier
-import edu.wpi.first.wpilibj.controller.PIDController
+import frc.team6502.kyberlib.CANId
+import frc.team6502.kyberlib.CANRegistry
+import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
+import frc.team6502.kyberlib.motorcontrol.MotorType.*
 
-enum class SoftwarePIDMode {
-    DISABLED,
-    POSITION,
-    VELOCITY
-}
+class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController(canId, motorType, apply) {
 
-class KSparkMax(val canId: Int, val type: MotorType) : KMotorController {
+    override var identifier: String = CANRegistry.filterValues { it == canId }.keys.firstOrNull() ?: "can$canId"
 
-    var radius: Length? = null
+    override fun set(value: Double?, ff: Double) {
+        when (closedLoopMode) {
+            ClosedLoopMode.VELOCITY -> _pid.setReference(value ?: velocitySetpoint.rpm, ControlType.kVelocity, 0, ff, CANPIDController.ArbFFUnits.kVoltage)
+            ClosedLoopMode.POSITION -> _pid.setReference(value ?: positionSetpoint.rotations, ControlType.kPosition, 0, ff, CANPIDController.ArbFFUnits.kVoltage)
+            ClosedLoopMode.NONE -> _spark.set((value ?: 0.0) + ff / 12.0)
+        }
+    }
 
-    private val _spark = CANSparkMax(canId, type)
-    private var _enc = _spark.getEncoder(SensorType.kNoSensor, 0)
-    private var _rioEncoder: Encoder? = null
-    private val _pid = _spark.pidController
+    override fun updatePIDGains(kP: Double, kI: Double, kD: Double) {
+        _pid.p = kP
+        _pid.i = kI
+        _pid.d = kD
+    }
 
-    // SOFTWARE PID
-    private val _softwarePid = PIDController(0.0, 0.0, 0.0, 0.02)
-    private var softwarePIDMode = SoftwarePIDMode.DISABLED
-    private val _softwarePidNotifier = Notifier {
-        if (_rioEncoder != null) {
-            when (softwarePIDMode) {
-                SoftwarePIDMode.POSITION -> _spark.set(_softwarePid.calculate(_rioEncoder!!.distance))
-                SoftwarePIDMode.VELOCITY -> _spark.set(_softwarePid.calculate(_rioEncoder!!.rate))
-                SoftwarePIDMode.DISABLED -> {
-                }
+    override fun updateFollowers() {
+        for (follower in followers) {
+            if (follower is KSparkMax) {
+                // use native follow if not already
+                if (!follower._spark.isFollower) follower._spark.follow(_spark, follower.reversed != this.reversed)
+            } else {
+                // use software follow
+                follower.percentOutput = _spark.appliedOutput.invertIf { follower.reversed != this.reversed }
             }
         }
     }
 
-    fun configEncoder(type: SensorType, cpr: Int, reverse: Boolean) {
-        _enc = _spark.getEncoder(type, cpr)
-        _enc.inverted = reverse
+    override fun setBrakeMode(brakeMode: BrakeMode) {
+        _spark.idleMode = when (brakeMode) {
+            true -> CANSparkMax.IdleMode.kBrake
+            false -> CANSparkMax.IdleMode.kCoast
+        }
     }
 
-    fun configRioEncoder(a: Int, b: Int, reverse: Boolean, cpr: Int) {
-        _rioEncoder = Encoder(a, b, reverse, CounterBase.EncodingType.k4X)
-        _rioEncoder?.distancePerPulse = 1.0 / cpr
-        _softwarePidNotifier.startPeriodic(0.02)
+    override fun setReversed(reversed: Boolean) {
+        _spark.inverted = reversed
     }
+
+    override fun configureEncoder(config: KEncoderConfig): Boolean {
+        return when {
+            config.type == EncoderType.NEO_HALL && motorType == BRUSHLESS -> {
+                _enc = _spark.encoder
+                _enc?.inverted = config.reversed
+                true
+            }
+            config.type == EncoderType.QUADRATURE && motorType == BRUSHED -> {
+                _enc = _spark.getEncoder(com.revrobotics.EncoderType.kQuadrature, config.cpr)
+                _enc?.inverted = config.reversed
+                true
+            }
+            else -> {
+                false
+            }
+        }
+    }
+
+    private val _spark = CANSparkMax(canId, when (motorType) {
+        BRUSHLESS -> MotorType.kBrushless
+        BRUSHED -> MotorType.kBrushed
+    })
+    private var _enc: CANEncoder? = null
+    private val _pid: CANPIDController by lazy { _spark.pidController }
 
     init {
         _spark.restoreFactoryDefaults()
-        if (type == MotorType.kBrushless) {
-            configEncoder(SensorType.kHallSensor, 0, false)
+
+        // running NEO with integrated encoder
+        if (motorType == BRUSHLESS) {
+            encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
         }
     }
-
-    var inverted: Boolean
-        get() = _spark.inverted
-        set(value) {
-            _spark.inverted = value
-        }
-
-    override var kP: Double
-        get() = _pid.p
-        set(value) {
-            _pid.p = value
-            _softwarePid.p = value
-        }
-
-    override var kI: Double
-        get() = _pid.i
-        set(value) {
-            _pid.i = value
-            _softwarePid.i = value
-        }
-
-    override var kD: Double
-        get() = _pid.d
-        set(value) {
-            _pid.d = value
-            _softwarePid.d = value
-        }
 
     override var percentOutput: Double
         get() = _spark.appliedOutput
         set(value) {
-            softwarePIDMode = SoftwarePIDMode.DISABLED
-            _spark.set(value)
+            set(value, feedForward)
         }
 
     override var positionSetpoint = 0.radians
         set(value) {
-            softwarePIDMode = SoftwarePIDMode.POSITION
-            if (_rioEncoder == null) _pid.setReference(value.rotations, ControlType.kPosition)
+            if (!closedLoopConfigured) {
+                logError("Cannot set position without a configured encoder")
+                return
+            }
+            closedLoopMode = ClosedLoopMode.POSITION
+            set(value.rotations * gearRatio, feedForward)
             field = value
         }
 
     override var position: Angle
-        get() = _enc.position.rotations
+        get() {
+            if (!closedLoopConfigured) {
+                logError("Cannot get position without a configured encoder")
+                return 0.rotations
+            }
+            return _enc!!.position.rotations
+        }
         set(value) {
             positionSetpoint = value
         }
 
     override var linearPositionSetpoint = 0.feet
         set(value) {
-            requireNotNull(radius) { "Cannot set motor controller linearPosition without a defined radius" }
+            if (!linearConfigured) {
+                logError("Cannot set linear position without a defined radius")
+                return
+            }
             positionSetpoint = value / radius!!
             field = value
         }
 
     override var linearPosition: Length
         get() {
-            requireNotNull(radius) { "Cannot get motor controller linearPosition without a defined radius" }
-            return _enc.position.rotations.times(radius!!)
+            if (!linearConfigured) {
+                logError("Cannot get linear position without a defined radius")
+                return 0.feet
+            }
+            return _enc!!.position.rotations.times(radius!!) * (1 / gearRatio)
         }
         set(value) {
             linearPositionSetpoint = value
@@ -122,81 +139,47 @@ class KSparkMax(val canId: Int, val type: MotorType) : KMotorController {
 
     override var velocitySetpoint: AngularVelocity = 0.rpm
         set(value) {
-            softwarePIDMode = SoftwarePIDMode.VELOCITY
-            if (_rioEncoder == null) _pid.setReference(value.rpm, ControlType.kVelocity)
+            if (!closedLoopConfigured) {
+                logError("Cannot set velocity without a configured encoder")
+                return
+            }
             field = value
+            closedLoopMode = ClosedLoopMode.VELOCITY
+            set(value.rpm, feedForward)
         }
 
     override var velocity: AngularVelocity
-        get() = _enc.velocity.rpm
+        get() {
+            if (!closedLoopConfigured) {
+                logError("Cannot set velocity without a configured encoder")
+                return 0.rpm
+            }
+            return _enc!!.velocity.rpm * (1 / gearRatio)
+        }
         set(value) {
             velocitySetpoint = value
         }
 
     override var linearVelocitySetpoint: LinearVelocity = 0.feetPerSecond
         set(value) {
-            requireNotNull(radius) { "Cannot set motor controller linearVelocity without a defined radius" }
+            if (!linearConfigured) {
+                logError("Cannot set linear velocity without a defined radius")
+                return
+            }
             velocitySetpoint = value / radius!!
             field = value
         }
+
     override var linearVelocity: LinearVelocity
         get() {
-            requireNotNull(radius) { "Cannot get motor controller linearVelocity without a defined radius" }
-            return _enc.velocity.rpm * radius!!
+            if (!linearConfigured) {
+                logError("Cannot get linear velocity without a defined radius")
+                return 0.feetPerSecond
+            }
+            return _enc!!.velocity.rpm * radius!!
         }
         set(value) {
             linearVelocitySetpoint = value
         }
 
 }
-
-class KSparkMaxBuilder(id: Int, type: MotorType) {
-
-    val s = KSparkMax(id, type)
-
-    /**
-     * Configures an external encoder. NEO internal encoders are automatically assumed if the motor type is brushless.
-     * [sensorType] determines if the sensor is hall, quadrature, or analog, and [cpr] is the sensor's counts per revolution.
-     */
-    fun encoder(sensorType: SensorType, cpr: Int, reverse: Boolean) {
-        require(s.type != MotorType.kBrushless) { "Brushless motors must use their integrated encoder" }
-        s.configEncoder(sensorType, cpr, reverse)
-    }
-
-    /**
-     * Configures an encoder connected to the roboRIO's DIO pins on [channelA] and [channelB].
-     */
-    fun encoder(channelA: Int, channelB: Int, reverse: Boolean, cpr: Int) {
-        s.configRioEncoder(channelA, channelB, reverse, cpr)
-    }
-
-    /**
-     * Sets [kP], [kI], and [kD] gains for the motor controller
-     */
-    fun pid(kP: Double, kI: Double, kD: Double) {
-        s.kP = kP
-        s.kI = kI
-        s.kD = kD
-    }
-
-    /**
-     * Sets the output radius for the motor. Used to set distance instead of position
-     */
-    fun radius(r: Length) {
-        s.radius = r
-    }
-
-    fun invert(i: Boolean) {
-        s.inverted = i
-    }
-
-    fun build(): KSparkMax {
-        return s
-    }
-
-}
-
-fun sparkmax(id: Int, type: MotorType, init: KSparkMaxBuilder.() -> Unit): KSparkMax {
-    return KSparkMaxBuilder(id, type).apply(init).build()
-}
-
