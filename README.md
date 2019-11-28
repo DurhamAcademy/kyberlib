@@ -1,6 +1,8 @@
 <img width="50%" src="https://6502.team/img/external/kyber-dark.png">
 DARC SIDE's standard FRC libraries for 2020 and beyond.
 
+[Latest Jitpack](https://jitpack.io/#DurhamAcademy/kyberlib/master-SNAPSHOT)
+
 <br>
 
 # Features
