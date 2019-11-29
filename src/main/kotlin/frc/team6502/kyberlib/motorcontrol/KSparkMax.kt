@@ -11,33 +11,33 @@ import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
 import frc.team6502.kyberlib.motorcontrol.MotorType.*
 
-class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController(canId, motorType, apply) {
+class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController() {
 
     override var identifier: String = CANRegistry.filterValues { it == canId }.keys.firstOrNull() ?: "can$canId"
 
-    override fun set(value: Double?, ff: Double) {
-        when (closedLoopMode) {
-            ClosedLoopMode.VELOCITY -> _pid.setReference(value ?: velocitySetpoint.rpm, ControlType.kVelocity, 0, ff, CANPIDController.ArbFFUnits.kVoltage)
-            ClosedLoopMode.POSITION -> _pid.setReference(value ?: positionSetpoint.rotations, ControlType.kPosition, 0, ff, CANPIDController.ArbFFUnits.kVoltage)
-            ClosedLoopMode.NONE -> _spark.set((value ?: 0.0) + ff / 12.0)
+    private val _spark = CANSparkMax(canId, when (motorType) {
+        BRUSHLESS -> MotorType.kBrushless
+        BRUSHED -> MotorType.kBrushed
+    })
+
+    private var _enc: CANEncoder? = null
+
+    init {
+        _spark.restoreFactoryDefaults()
+
+        // running NEO with integrated encoder
+        if (motorType == BRUSHLESS) {
+            encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
         }
     }
 
-    override fun updatePIDGains(kP: Double, kI: Double, kD: Double) {
-        _pid.p = kP
-        _pid.i = kI
-        _pid.d = kD
+    override fun set(value: Double) {
+        _spark.set(value / 12.0)
     }
 
     override fun updateFollowers() {
         for (follower in followers) {
-            if (follower is KSparkMax) {
-                // use native follow if not already
-                if (!follower._spark.isFollower) follower._spark.follow(_spark, follower.reversed != this.reversed)
-            } else {
-                // use software follow
-                follower.percentOutput = _spark.appliedOutput.invertIf { follower.reversed != this.reversed }
-            }
+            follower.percentOutput = _spark.appliedOutput.invertIf { follower.reversed != this.reversed }
         }
     }
 
@@ -70,37 +70,10 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
         }
     }
 
-    private val _spark = CANSparkMax(canId, when (motorType) {
-        BRUSHLESS -> MotorType.kBrushless
-        BRUSHED -> MotorType.kBrushed
-    })
-    private var _enc: CANEncoder? = null
-    private val _pid: CANPIDController by lazy { _spark.pidController }
-
-    init {
-        _spark.restoreFactoryDefaults()
-
-        // running NEO with integrated encoder
-        if (motorType == BRUSHLESS) {
-            encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
-        }
-    }
-
-    override var percentOutput: Double
+    override var appliedOutput: Double
         get() = _spark.appliedOutput
         set(value) {
-            set(value, feedForward)
-        }
-
-    override var positionSetpoint = 0.radians
-        set(value) {
-            if (!closedLoopConfigured) {
-                logError("Cannot set position without a configured encoder")
-                return
-            }
-            closedLoopMode = ClosedLoopMode.POSITION
-            set(value.rotations * gearRatio, feedForward)
-            field = value
+            percentOutput = value
         }
 
     override var position: Angle
@@ -109,20 +82,10 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
                 logError("Cannot get position without a configured encoder")
                 return 0.rotations
             }
-            return _enc!!.position.rotations
+            return _enc!!.position.rotations * (1 / gearRatio)
         }
         set(value) {
             positionSetpoint = value
-        }
-
-    override var linearPositionSetpoint = 0.feet
-        set(value) {
-            if (!linearConfigured) {
-                logError("Cannot set linear position without a defined radius")
-                return
-            }
-            positionSetpoint = value / radius!!
-            field = value
         }
 
     override var linearPosition: Length
@@ -131,21 +94,10 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
                 logError("Cannot get linear position without a defined radius")
                 return 0.feet
             }
-            return _enc!!.position.rotations.times(radius!!) * (1 / gearRatio)
+            return (_enc!!.position.rotations * radius!!) * (1/gearRatio)
         }
         set(value) {
             linearPositionSetpoint = value
-        }
-
-    override var velocitySetpoint: AngularVelocity = 0.rpm
-        set(value) {
-            if (!closedLoopConfigured) {
-                logError("Cannot set velocity without a configured encoder")
-                return
-            }
-            field = value
-            closedLoopMode = ClosedLoopMode.VELOCITY
-            set(value.rpm, feedForward)
         }
 
     override var velocity: AngularVelocity
@@ -154,20 +106,10 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
                 logError("Cannot set velocity without a configured encoder")
                 return 0.rpm
             }
-            return _enc!!.velocity.rpm * (1 / gearRatio)
+            return _enc!!.velocity.rpm * (1/gearRatio)
         }
         set(value) {
             velocitySetpoint = value
-        }
-
-    override var linearVelocitySetpoint: LinearVelocity = 0.feetPerSecond
-        set(value) {
-            if (!linearConfigured) {
-                logError("Cannot set linear velocity without a defined radius")
-                return
-            }
-            velocitySetpoint = value / radius!!
-            field = value
         }
 
     override var linearVelocity: LinearVelocity
@@ -181,5 +123,9 @@ class KSparkMax(canId: CANId, motorType: frc.team6502.kyberlib.motorcontrol.Moto
         set(value) {
             linearVelocitySetpoint = value
         }
+
+    override fun zeroPosition() {
+        _enc?.position = 0.0
+    }
 
 }
