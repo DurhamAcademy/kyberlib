@@ -1,6 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.DriverStation
+import frc.team6502.kyberlib.math.invertIf
 
 abstract class KBasicMotorController {
 
@@ -12,12 +13,14 @@ abstract class KBasicMotorController {
 
     var debug = false
 
-    abstract var identifier: String
+    abstract val identifier: String
 
     abstract var appliedOutput: Double
     abstract var percentOutput: Double
     var feedForward: Double = 0.0
 
+    var isFollower = false
+        internal set
     var followers: Array<KBasicMotorController> = arrayOf()
 
     var reversed: Boolean = false
@@ -28,7 +31,11 @@ abstract class KBasicMotorController {
 
     open fun update() {
         set(percentOutput * 12 + feedForward)
-        updateFollowers()
+        for (follower in followers) {
+            follower.isFollower = true
+            follower.percentOutput = appliedOutput.invertIf { follower.reversed }
+            follower.update()
+        }
     }
 
     /**
@@ -42,11 +49,6 @@ abstract class KBasicMotorController {
     internal abstract fun setReversed(reversed: Boolean)
 
     internal abstract fun set(value: Double)
-
-    /**
-     * Makes all followers follow the master
-     */
-    internal abstract fun updateFollowers()
 
     fun logError(text: String) {
         DriverStation.reportError("[$identifier] $text", false)

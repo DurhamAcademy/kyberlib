@@ -13,7 +13,7 @@ import frc.team6502.kyberlib.motorcontrol.MotorType.*
 
 class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController() {
 
-    override var identifier: String = CANRegistry.filterValues { it == canId }.keys.firstOrNull() ?: "can$canId"
+    override val identifier: String = CANRegistry.filterValues { it == canId }.keys.firstOrNull() ?: "can$canId"
 
     private val _spark = CANSparkMax(canId, when (motorType) {
         BRUSHLESS -> MotorType.kBrushless
@@ -33,12 +33,6 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override fun set(value: Double) {
         _spark.set(value / 12.0)
-    }
-
-    override fun updateFollowers() {
-        for (follower in followers) {
-            follower.percentOutput = _spark.appliedOutput.invertIf { follower.reversed != this.reversed }
-        }
     }
 
     override fun setBrakeMode(brakeMode: BrakeMode) {

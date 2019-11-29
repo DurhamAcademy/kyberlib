@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.controller.PIDController
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile
 import frc.team6502.kyberlib.CANId
+import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
 
 typealias GearRatio = Double
@@ -146,7 +147,11 @@ abstract class KMotorController: KBasicMotorController() {
             }
         }
 
-        updateFollowers()
+        for (follower in followers) {
+            follower.percentOutput = appliedOutput.invertIf { follower.reversed }
+            follower.update()
+            follower.isFollower = true
+        }
     }
 
 

@@ -8,7 +8,7 @@ internal class KSimulatedESCTest {
 
     @Test
     fun testPercentOutput() {
-        val sim = KSimulatedESC()
+        val sim = KSimulatedESC("sim")
         sim.percentOutput = 0.5
         sim.update()
 
@@ -17,13 +17,14 @@ internal class KSimulatedESCTest {
 
     @Test
     fun testFollow() {
-        val master = KSimulatedESC()
-        val slave = KSimulatedESC()
+        val master = KSimulatedESC("master")
+        val slave = KSimulatedESC("slave")
 
         slave.percentOutput = 0.2
         slave.update()
 
         master.followers += slave
+        master.update()
 
         master.percentOutput = 0.4
         master.update()
@@ -49,7 +50,7 @@ internal class KSimulatedESCTest {
 
     @Test
     fun testPID() {
-        val sim = KSimulatedESC {
+        val sim = KSimulatedESC("sim") {
             kP = 0.1
             encoderConfig = KEncoderConfig(1024, EncoderType.QUADRATURE)
         }
@@ -57,7 +58,7 @@ internal class KSimulatedESCTest {
         sim.positionSetpoint = 1.rotations
         sim.update()
 
-        assertEquals(0.1, sim.appliedOutput, 0.02)
+        assertEquals(0.1, sim.appliedOutput, 0.01)
 
         sim.position = 1.rotations
         sim.update()

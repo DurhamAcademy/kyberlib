@@ -2,8 +2,9 @@ package frc.team6502.kyberlib.motorcontrol
 
 import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
+import kotlin.math.withSign
 
-class KSimulatedESC(apply: KSimulatedESC.() -> Unit = {}): KMotorController() {
+class KSimulatedESC(val name: String, apply: KSimulatedESC.() -> Unit = {}): KMotorController() {
 
     init {
         this.apply(apply)
@@ -23,18 +24,12 @@ class KSimulatedESC(apply: KSimulatedESC.() -> Unit = {}): KMotorController() {
         position = 0.degrees
     }
 
-    override fun updateFollowers() {
-        for (follower in followers) {
-            follower.percentOutput = this.appliedOutput.invertIf { follower.reversed != this.reversed }
-            follower.update()
-        }
-    }
-
     override fun configureEncoder(config: KEncoderConfig): Boolean {
         return true
     }
 
-    override var identifier: String = "TEST"
+    override val identifier
+        get() = name
 
     override fun setBrakeMode(brakeMode: BrakeMode) {
 
@@ -45,7 +40,7 @@ class KSimulatedESC(apply: KSimulatedESC.() -> Unit = {}): KMotorController() {
     }
 
     override fun set(value: Double) {
-        appliedOutput = value / 12.0
+        appliedOutput = (value / 12.0).withSign(value * if(reversed && !isFollower) -1 else 1)
     }
 
 }
