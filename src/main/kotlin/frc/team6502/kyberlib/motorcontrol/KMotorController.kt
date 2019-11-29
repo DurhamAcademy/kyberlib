@@ -1,16 +1,15 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.Notifier
+import edu.wpi.first.wpilibj.controller.PIDController
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile
 import frc.team6502.kyberlib.CANId
-import frc.team6502.kyberlib.math.units.Angle
-import frc.team6502.kyberlib.math.units.AngularVelocity
-import frc.team6502.kyberlib.math.units.Length
-import frc.team6502.kyberlib.math.units.LinearVelocity
+import frc.team6502.kyberlib.math.invertIf
+import frc.team6502.kyberlib.math.units.*
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
-
-const val FOLLOW_PERIOD = 0.02
 
 enum class EncoderType {
     NONE, NEO_HALL, QUADRATURE
@@ -26,12 +25,11 @@ enum class MotorType {
 
 data class KEncoderConfig(val cpr: Int, val type: EncoderType, val reversed: Boolean = false)
 
-abstract class KMotorController(val canId: CANId, val motorType: MotorType, apply: KMotorController.() -> Unit): KBasicMotorController() {
+abstract class KMotorController: KBasicMotorController() {
 
-    init {
-        this.apply(apply)
-    }
 
+
+    protected val pidController = PIDController(0.0, 0.0, 0.0)
 
     // Status of various configurable properties
     protected var linearConfigured = false
@@ -42,17 +40,9 @@ abstract class KMotorController(val canId: CANId, val motorType: MotorType, appl
     protected val closedLoopConfigured
         get() = encoderConfigured && (kP != 0.0 || kI != 0.0 || kD != 0.0)
 
-    var closedLoopMode = ClosedLoopMode.NONE
-        protected set
+    private var closedLoopMode = ClosedLoopMode.NONE
 
-    override var feedForward: Double = 0.0
-        set(value) {
-            when (closedLoopMode) {
-                ClosedLoopMode.NONE -> set(percentOutput - feedForward / 12.0, value)
-                else -> set(null, value)
-            }
-            field = value
-        }
+
 
     var encoderConfig: KEncoderConfig = KEncoderConfig(0, EncoderType.NONE)
         set(value) {
@@ -74,51 +64,99 @@ abstract class KMotorController(val canId: CANId, val motorType: MotorType, appl
     var kP: Double = 0.0
         set(value) {
             field = value
-            updatePIDGains(kP, kI, kD)
+            pidController.p = value
         }
     var kI: Double = 0.0
         set(value) {
             field = value
-            updatePIDGains(kP, kI, kD)
+            pidController.i = value
         }
     var kD: Double = 0.0
         set(value) {
             field = value
-            updatePIDGains(kP, kI, kD)
+            pidController.d = value
         }
 
-    abstract var positionSetpoint: Angle
+
     abstract var position: Angle
-    abstract var linearPositionSetpoint: Length
     abstract var linearPosition: Length
-    abstract var velocitySetpoint: AngularVelocity
     abstract var velocity: AngularVelocity
-    abstract var linearVelocitySetpoint: LinearVelocity
     abstract var linearVelocity: LinearVelocity
 
-    private val followerNotifier = Notifier {
-        updateFollowers()
-    }
-
-    var followers: Array<KBasicMotorController> = arrayOf()
+    override var percentOutput: Double = 0.0
         set(value) {
+            closedLoopMode = ClosedLoopMode.NONE
             field = value
-            if (value.isNotEmpty()) {
-                followerNotifier.startPeriodic(FOLLOW_PERIOD)
+        }
+
+    var positionSetpoint: Angle = 0.rotations
+        set(value) {
+            if(!encoderConfigured){
+               logError("Cannot set position without a configured encoder")
             } else {
-                followerNotifier.stop()
+                closedLoopMode = ClosedLoopMode.POSITION
+                field = value
             }
         }
 
-    /**
-     * Updates the gains of the motor controller's PID controller.
-     */
-    internal abstract fun updatePIDGains(kP: Double, kI: Double, kD: Double)
+    var linearPositionSetpoint: Length = 0.meters
+        set(value) {
+            if(!encoderConfigured || !linearConfigured){
+                logError("Cannot set linear position without a configured encoder and radius")
+            } else {
+                field = value
+                positionSetpoint = value / radius!!
+            }
+        }
 
-    /**
-     * Makes all followers follow the master
-     */
-    internal abstract fun updateFollowers()
+    var velocitySetpoint: AngularVelocity = 0.rpm
+        set(value) {
+            if(!encoderConfigured){
+                logError("Cannot set velocity without a configured encoder")
+            } else {
+                closedLoopMode = ClosedLoopMode.VELOCITY
+                field = value
+            }
+        }
+
+    var linearVelocitySetpoint: LinearVelocity = 0.metersPerSecond
+        set(value) {
+            if(!encoderConfigured || !linearConfigured){
+                logError("Cannot set linear velocity without a configured encoder and radius")
+            } else {
+                field = value
+                velocitySetpoint = value / radius!!
+            }
+        }
+
+    override fun update(){
+
+        // perform PID computations
+        when(closedLoopMode){
+            ClosedLoopMode.POSITION -> {
+                val output = pidController.calculate(position.rotations, positionSetpoint.rotations)
+                set(output * 12.0 + feedForward)
+            }
+            ClosedLoopMode.VELOCITY -> {
+                val output = pidController.calculate(velocity.rpm, velocitySetpoint.rpm)
+                set(output * 12.0 + feedForward)
+            }
+            else -> {
+                // don't use PID
+                set(percentOutput * 12 + feedForward)
+            }
+        }
+
+        for (follower in followers) {
+            follower.percentOutput = appliedOutput.invertIf { follower.reversed }
+            follower.update()
+            follower.isFollower = true
+        }
+    }
+
+
+
+    abstract fun zeroPosition()
 
     internal abstract fun configureEncoder(config: KEncoderConfig): Boolean
 }
