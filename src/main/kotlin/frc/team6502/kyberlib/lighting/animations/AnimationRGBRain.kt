@@ -33,8 +33,9 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
 
 //        println(rgb.size)
 
-        for (i in 0 until (ticks / ticksPerMovement) % dropLength) {
+        for (i in 0 until (ticks / ticksPerMovement) % (dropLength * rgb.size)) {
             b.add(0, b.removeAt(b.size - 1))
+            rgb.add(0, rgb.removeAt(rgb.size - 1))
         }
 
         if (reversed) {
