@@ -22,7 +22,7 @@ class KLEDStrip(port: Int, private val length: Int) {
 
     operator fun plusAssign(other: KLEDRegion) {
         require(other.end > other.start)
-        require(other.start > 0)
+        require(other.start >= 0)
         require(other.end <= length)
 
         regions.add(other)
