@@ -1,7 +1,7 @@
 <img width="50%" src="https://6502.team/img/external/kyber-dark.png">
 DARC SIDE's standard FRC libraries for 2020 and beyond.
 
-[Latest Jitpack](https://jitpack.io/#DurhamAcademy/kyberlib/master-SNAPSHOT)
+
 
 <br>
 
@@ -20,3 +20,12 @@ Your team has made it to the last tiebreaker match of finals, but when the match
 - Limelight wrapper
 - Automatic WPILib motion profile regeneration
 - LED animation profiles using the new AddressableLED class
+
+# Installation
+
+In `build.gradle`:
+
+- Add `maven { url 'https://jitpack.io' }` to your `repositories { ... }` block
+- Add `compile 'com.github.DurhamAcademy:kyberlib:master-SNAPSHOT'` to your  `dependencies { ... }` block
+
+`master-SNAPSHOT` will always give you the latest version, but a version number can also be specified. More information [here](https://jitpack.io/#DurhamAcademy/kyberlib/). For development, kyberlib can also be published to and used from the local Maven repository.
