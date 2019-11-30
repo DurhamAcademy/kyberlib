@@ -8,7 +8,7 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
     fun constructInitialBuffer(length: Int): MutableList<Color> {
 
         return Array<Color>(dropLength * ceil(length.toDouble() / dropLength).toInt()) {
-            Color(color.red * (it % dropLength) / (dropLength - 1), color.green * (it % dropLength) / (dropLength - 1), color.blue * (it % dropLength) / (dropLength - 1))
+            Color(color.red / 255F, color.green / 255F, color.blue / 255F, ((it % dropLength) / (dropLength - 1)).toFloat())
         }.toMutableList()
 
     }

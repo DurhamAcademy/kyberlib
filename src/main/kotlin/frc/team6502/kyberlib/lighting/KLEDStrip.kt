@@ -48,6 +48,10 @@ class KLEDStrip(port: Int, private val length: Int) {
             }
         }
 
+        for (i in mutableBuffer.indices) {
+            buffer.setLED(i, mutableBuffer[i].red, mutableBuffer[i].green, mutableBuffer[i].blue)
+        }
+
         addressableLED.setData(buffer)
 
         ticks++
