@@ -1,23 +1,28 @@
-package frc.team6502.kyberlib.motorcontrol
+package frc.team6502.kyberlib.motorcontrol.rev
 
 import com.revrobotics.CANEncoder
-import com.revrobotics.CANPIDController
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
-import com.revrobotics.ControlType
 import frc.team6502.kyberlib.CANId
+import frc.team6502.kyberlib.CANKey
 import frc.team6502.kyberlib.CANRegistry
-import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
-import frc.team6502.kyberlib.motorcontrol.MotorType.*
+import frc.team6502.kyberlib.motorcontrol.BrakeMode
+import frc.team6502.kyberlib.motorcontrol.EncoderType
+import frc.team6502.kyberlib.motorcontrol.KEncoderConfig
+import frc.team6502.kyberlib.motorcontrol.KMotorController
+import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
+import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
 
 class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController() {
+
+    constructor(canKey: CANKey, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : this(CANRegistry[canKey]!!, motorType, apply)
 
     override val identifier: String = CANRegistry.filterValues { it == canId }.keys.firstOrNull() ?: "can$canId"
 
     private val _spark = CANSparkMax(canId, when (motorType) {
         BRUSHLESS -> MotorType.kBrushless
-        BRUSHED -> MotorType.kBrushed
+        BRUSHED   -> MotorType.kBrushed
     })
 
     private var _enc: CANEncoder? = null
@@ -58,7 +63,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
                 _enc?.inverted = config.reversed
                 true
             }
-            else -> {
+            else                                                          -> {
                 false
             }
         }

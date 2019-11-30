@@ -8,7 +8,7 @@ abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 
     internal lateinit var suite: DiagnosticSuite
     var indexInSuite = 0
     var suiteLength = 1
-    var executed = false
+    private var executed = false
 
     private val timer = Timer()
 
