@@ -2,13 +2,14 @@ package frc.team6502.kyberlib.lighting.animations
 
 import java.awt.Color
 import kotlin.math.ceil
+import kotlin.math.sqrt
 
 class AnimationRain(private val color: Color, private val dropLength: Int, val ticksPerMovement: Int, val reversed: Boolean = false) : LEDAnimation() {
 
     fun constructInitialBuffer(length: Int): MutableList<Color> {
 
         return Array<Color>(dropLength * ceil(length.toDouble() / dropLength).toInt()) {
-            val alpha = (it % dropLength) / (dropLength - 1).toFloat()
+            val alpha = sqrt((it % dropLength) / (dropLength - 1).toFloat())
             Color(color.red / 255F, color.green / 255F, color.blue / 255F, alpha)
         }.toMutableList()
 
