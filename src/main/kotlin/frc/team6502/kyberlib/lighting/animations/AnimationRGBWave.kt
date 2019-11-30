@@ -1,6 +1,5 @@
 package frc.team6502.kyberlib.lighting.animations
 
-import edu.wpi.first.wpilibj.AddressableLEDBuffer
 import java.awt.Color
 
 class AnimationRGBWave(private val cycles: Int = 1, val ticksPerMovement: Int, val reversed: Boolean = false) : LEDAnimation() {
@@ -14,7 +13,7 @@ class AnimationRGBWave(private val cycles: Int = 1, val ticksPerMovement: Int, v
 
     }
 
-    override fun getBuffer(ticks: Int, length: Int): AddressableLEDBuffer {
+    override fun getBuffer(ticks: Int, length: Int): List<Color> {
         val b = constructInitialBuffer(length)
 
         for (i in 0 until (ticks / ticksPerMovement) % length) {
@@ -23,7 +22,7 @@ class AnimationRGBWave(private val cycles: Int = 1, val ticksPerMovement: Int, v
 
         if (reversed) b.reverse()
 
-        return bufferFromList(length, b)
+        return b
     }
 
 }

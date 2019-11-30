@@ -1,6 +1,5 @@
 package frc.team6502.kyberlib.lighting.animations
 
-import edu.wpi.first.wpilibj.AddressableLEDBuffer
 import java.awt.Color
 import kotlin.math.ceil
 
@@ -10,11 +9,11 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
 
         return Array<Color>(dropLength * ceil(length.toDouble() / dropLength).toInt()) {
             Color(color.red * (it % dropLength) / (dropLength - 1), color.green * (it % dropLength) / (dropLength - 1), color.blue * (it % dropLength) / (dropLength - 1))
-        }.asList().toMutableList()
+        }.toMutableList()
 
     }
 
-    override fun getBuffer(ticks: Int, length: Int): AddressableLEDBuffer {
+    override fun getBuffer(ticks: Int, length: Int): List<Color> {
         val b = constructInitialBuffer(length)
 
         for (i in 0 until (ticks / ticksPerMovement) % dropLength) {
@@ -23,7 +22,7 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
 
         if (reversed) b.reverse()
 
-        return bufferFromList(length, b)
+        return b.take(length)
     }
 
 }
