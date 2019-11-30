@@ -2,6 +2,7 @@ package frc.team6502.kyberlib.lighting
 
 import edu.wpi.first.wpilibj.AddressableLED
 import edu.wpi.first.wpilibj.AddressableLEDBuffer
+import java.awt.Color
 
 class KLEDStrip(port: Int, private val length: Int) {
 
@@ -29,12 +30,21 @@ class KLEDStrip(port: Int, private val length: Int) {
     }
 
     fun update() {
+        val mutableBuffer = Array<Color>(length) { Color.BLACK }
         val buffer = AddressableLEDBuffer(length)
 
         for (region in regions) {
             val b = region.getBuffer(ticks) ?: continue
             for (i in b.indices) {
-                buffer.setLED(region.start + i, b[i].red, b[i].green, b[i].blue)
+                if (b[i].alpha < 1 && region.enableTransparency) {
+                    mutableBuffer[region.start + i] = Color(
+                            b[i].red * b[i].alpha + mutableBuffer[region.start + i].red * (1 - b[i].alpha),
+                            b[i].green * b[i].alpha + mutableBuffer[region.start + i].green * (1 - b[i].alpha),
+                            b[i].blue * b[i].alpha + mutableBuffer[region.start + i].blue * (1 - b[i].alpha)
+                    )
+                } else {
+                    mutableBuffer[region.start + i] = Color(b[i].red, b[i].green, b[i].blue)
+                }
             }
         }
 
