@@ -38,9 +38,9 @@ class KLEDStrip(port: Int, private val length: Int) {
             for (i in b.indices) {
                 if (b[i].alpha < 1 && region.enableTransparency) {
                     mutableBuffer[region.start + i] = Color(
-                            b[i].red * b[i].alpha + mutableBuffer[region.start + i].red * (1 - b[i].alpha),
-                            b[i].green * b[i].alpha + mutableBuffer[region.start + i].green * (1 - b[i].alpha),
-                            b[i].blue * b[i].alpha + mutableBuffer[region.start + i].blue * (1 - b[i].alpha)
+                            (b[i].red / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].red / 255F) * (1 - b[i].alpha / 255F),
+                            (b[i].green / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].green / 255F) * (1 - b[i].alpha / 255F),
+                            (b[i].blue / 255F) * (b[i].alpha / 255F) + (mutableBuffer[region.start + i].blue / 255F) * (1 - b[i].alpha / 255F)
                     )
                 } else {
                     mutableBuffer[region.start + i] = Color(b[i].red, b[i].green, b[i].blue)
