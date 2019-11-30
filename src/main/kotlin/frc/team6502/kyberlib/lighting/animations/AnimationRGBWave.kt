@@ -8,7 +8,7 @@ class AnimationRGBWave(private val cycles: Int = 1, val ticksPerMovement: Int, v
 
         return Array<Color>(length) {
             val hue = (it % (length / cycles)) / (length / cycles).toFloat()
-            Color.getHSBColor(hue, 1F, 0.5F)
+            Color.getHSBColor(hue, 1F, 1F)
         }.asList().toMutableList()
 
     }
