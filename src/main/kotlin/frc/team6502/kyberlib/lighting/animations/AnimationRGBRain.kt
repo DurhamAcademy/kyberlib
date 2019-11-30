@@ -8,7 +8,8 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
     fun constructInitialBuffer(length: Int): MutableList<Color> {
 
         return Array<Color>(dropLength * ceil(length.toDouble() / dropLength).toInt()) {
-            Color(255 * (it % dropLength) / (dropLength - 1), 255 * (it % dropLength) / (dropLength - 1), 255 * (it % dropLength) / (dropLength - 1))
+            val alpha = (it % dropLength) / (dropLength - 1).toFloat()
+            Color(255F, 255F, 255F, alpha)
         }.toMutableList()
 
     }
@@ -45,7 +46,7 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
 
         val trimmed = b.take(length).toMutableList()
         for (i in trimmed.indices) {
-            trimmed[i] = Color((trimmed[i].red * rgb[i].red / 255.0).toInt(), (trimmed[i].green * rgb[i].green / 255.0).toInt(), (trimmed[i].blue * rgb[i].blue / 255.0).toInt())
+            trimmed[i] = Color((trimmed[i].red * rgb[i].red / 255.0).toInt(), (trimmed[i].green * rgb[i].green / 255.0).toInt(), (trimmed[i].blue * rgb[i].blue / 255.0).toInt(), trimmed[i].alpha)
         }
 
         return trimmed
