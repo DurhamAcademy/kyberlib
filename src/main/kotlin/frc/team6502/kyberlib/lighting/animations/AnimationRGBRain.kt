@@ -31,17 +31,23 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
         val b = constructInitialBuffer(length)
         val rgb = constructRGBBuffer(length)
 
+//        println(rgb.size)
+
         for (i in 0 until (ticks / ticksPerMovement) % dropLength) {
             b.add(0, b.removeAt(b.size - 1))
         }
 
-        for (i in b.indices) {
-            b[i] = Color((b[i].red * rgb[i].red / 255.0).toInt(), (b[i].green * rgb[i].green / 255.0).toInt(), (b[i].blue * rgb[i].blue / 255.0).toInt())
+        if (reversed) {
+            b.reverse()
+            rgb.reverse()
         }
 
-        if (reversed) b.reverse()
+        val trimmed = b.take(length).toMutableList()
+        for (i in trimmed.indices) {
+            trimmed[i] = Color((trimmed[i].red * rgb[i].red / 255.0).toInt(), (trimmed[i].green * rgb[i].green / 255.0).toInt(), (trimmed[i].blue * rgb[i].blue / 255.0).toInt())
+        }
 
-        return b.take(length)
+        return trimmed
     }
 
 }
