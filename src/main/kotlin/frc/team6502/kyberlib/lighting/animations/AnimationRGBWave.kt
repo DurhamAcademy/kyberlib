@@ -18,7 +18,7 @@ class AnimationRGBWave(private val cycles: Int = 1, val ticksPerMovement: Int, v
         val b = constructInitialBuffer(length)
 
         for (i in 0 until (ticks / ticksPerMovement) % length) {
-            b.add(0, b.takeLast(1)[0])
+            b.add(0, b.removeAt(b.size - 1))
         }
 
         if (reversed) b.reverse()

@@ -18,7 +18,7 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
         val b = constructInitialBuffer(length)
 
         for (i in 0 until (ticks / ticksPerMovement) % dropLength) {
-            b.add(0, b.takeLast(1)[0])
+            b.add(0, b.removeAt(b.size - 1))
         }
 
         if (reversed) b.reverse()
