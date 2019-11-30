@@ -28,7 +28,7 @@ class AnimationRGBWave(private val cycles: Double = 1.0, val ticksPerMovement: I
 
         if (reversed) b.reverse()
 
-        return b
+        return b.take(length)
     }
 
 }
