@@ -17,12 +17,12 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
         return if (cycles >= 1) {
             Array<Color>(length) {
                 val hue = (it % (length / cycles)) / (length / cycles)
-                Color.getHSBColor(hue.toFloat(), 1F, 1F)
+                Color.getHSBColor(1 - hue.toFloat(), 1F, 1F)
             }.asList().toMutableList()
         } else {
             Array<Color>((length / cycles).toInt()) {
                 val hue = it / (length / cycles)
-                Color.getHSBColor(hue.toFloat(), 1F, 1F)
+                Color.getHSBColor(1 - hue.toFloat(), 1F, 1F)
             }.asList().toMutableList()
         }
     }
