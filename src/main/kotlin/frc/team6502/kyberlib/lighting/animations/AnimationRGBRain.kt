@@ -39,14 +39,13 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
             rgb.add(0, rgb.removeAt(rgb.size - 1))
         }
 
-        if (reversed) {
-            b.reverse()
-            rgb.reverse()
-        }
-
         val trimmed = b.take(length).toMutableList()
         for (i in trimmed.indices) {
             trimmed[i] = Color((trimmed[i].red * rgb[i].red / 255.0).toInt(), (trimmed[i].green * rgb[i].green / 255.0).toInt(), (trimmed[i].blue * rgb[i].blue / 255.0).toInt(), trimmed[i].alpha)
+        }
+
+        if (reversed) {
+            trimmed.reverse()
         }
 
         return trimmed
