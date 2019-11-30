@@ -9,7 +9,7 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
 
         return Array<Color>(dropLength * ceil(length.toDouble() / dropLength).toInt()) {
             val alpha = (it % dropLength) / (dropLength - 1).toFloat()
-            Color(255F, 255F, 255F, alpha)
+            Color(1F, 1F, 1F, alpha)
         }.toMutableList()
 
     }
