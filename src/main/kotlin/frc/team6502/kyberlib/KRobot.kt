@@ -10,8 +10,6 @@ import frc.team6502.kyberlib.diagnostics.Diagnostics
 
 open class KRobot(private val period: Double = 0.02) {
 
-    private var diagnostics: Diagnostics? = null
-
     private inner class KRobotInternal : TimedRobot(period) {
 
         override fun robotInit() {
@@ -26,8 +24,8 @@ open class KRobot(private val period: Double = 0.02) {
         }
 
         override fun disabledInit() {
-            diagnostics?.cancel()
-            diagnostics = null
+            Diagnostics.singleton?.cancel()
+            Diagnostics.singleton = null
             this@KRobot.disabledInit()
         }
 
@@ -53,9 +51,9 @@ open class KRobot(private val period: Double = 0.02) {
 
         override fun testInit() {
             LiveWindow.setEnabled(false)
-            diagnostics = Diagnostics()
-            diagnostics(diagnostics!!)
-            diagnostics!!.schedule()
+            Diagnostics.singleton = Diagnostics()
+            diagnostics(Diagnostics.singleton!!)
+            Diagnostics.singleton!!.schedule()
         }
 
     }

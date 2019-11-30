@@ -1,7 +1,7 @@
 package frc.team6502.kyberlib.diagnostics
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
-import frc.team6502.kyberlib.plusAssign
+import frc.team6502.kyberlib.command.plusAssign
 
 
 class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticCommand) : SequentialCommandGroup() {
@@ -9,7 +9,7 @@ class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticComm
     internal var passed = 0
 
     init {
-        for (i in 0 until commands.size) {
+        for (i in commands.indices) {
             commands[i].suiteLength = commands.size
             commands[i].indexInSuite = i
             commands[i].suite = this

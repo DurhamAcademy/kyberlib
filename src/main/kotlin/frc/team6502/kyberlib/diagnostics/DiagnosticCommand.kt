@@ -2,7 +2,6 @@ package frc.team6502.kyberlib.diagnostics
 
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.CommandBase
-import frc.team6502.kyberlib.KRobot
 
 abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 0.0): CommandBase() {
 
@@ -27,8 +26,8 @@ abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 
         if (!interrupted && !executed) {
             executed = true
             report()
-            if (!hasPassed()) KRobot.diagnostics?.cancel()
-            if(hasPassed()) suite.passed++
+            if (!hasPassed()) Diagnostics.singleton?.cancel()
+            if (hasPassed()) suite.passed++
             cleanup()
         }
     }
