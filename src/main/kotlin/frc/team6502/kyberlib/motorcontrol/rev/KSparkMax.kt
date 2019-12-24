@@ -34,6 +34,9 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         if (motorType == BRUSHLESS) {
             encoderConfig = KEncoderConfig(42, EncoderType.NEO_HALL)
         }
+
+        this.apply(apply)
+        notifier.startPeriodic(0.005)
     }
 
     override fun set(value: Double) {
@@ -124,6 +127,9 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         }
 
     override fun zeroPosition() {
+        if (!encoderConfigured) {
+            return logError("Cannot reset encoder position without configured encoder")
+        }
         _enc?.position = 0.0
     }
 

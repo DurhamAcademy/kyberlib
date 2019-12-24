@@ -1,11 +1,6 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import edu.wpi.first.wpilibj.Notifier
 import edu.wpi.first.wpilibj.controller.PIDController
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile
-import frc.team6502.kyberlib.CANId
-import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.*
 
 typealias GearRatio = Double
@@ -27,8 +22,6 @@ data class KEncoderConfig(val cpr: Int, val type: EncoderType, val reversed: Boo
 
 abstract class KMotorController: KBasicMotorController() {
 
-
-
     protected val pidController = PIDController(0.0, 0.0, 0.0)
 
     // Status of various configurable properties
@@ -41,8 +34,6 @@ abstract class KMotorController: KBasicMotorController() {
         get() = encoderConfigured && (kP != 0.0 || kI != 0.0 || kD != 0.0)
 
     private var closedLoopMode = ClosedLoopMode.NONE
-
-
 
     var encoderConfig: KEncoderConfig = KEncoderConfig(0, EncoderType.NONE)
         set(value) {
@@ -147,14 +138,8 @@ abstract class KMotorController: KBasicMotorController() {
             }
         }
 
-        for (follower in followers) {
-            follower.percentOutput = appliedOutput.invertIf { follower.reversed }
-            follower.update()
-            follower.isFollower = true
-        }
+        updateFollowers()
     }
-
-
 
     abstract fun zeroPosition()
 
