@@ -14,6 +14,12 @@ import frc.team6502.kyberlib.motorcontrol.KMotorController
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
 
+/**
+ * Represents a REV Robotics Spark MAX motor controller.
+ * [canId] is the controller's ID on the CAN bus
+ * [motorType] is the type of motor being driven. WARNING: If set incorrectly this can seriously damage hardware. You've been warned.
+ * [apply] is where motor setup can occur
+ */
 class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : KMotorController() {
 
     constructor(canKey: CANKey, motorType: frc.team6502.kyberlib.motorcontrol.MotorType, apply: KMotorController.() -> Unit) : this(CANRegistry[canKey]!!, motorType, apply)
@@ -45,7 +51,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override fun setBrakeMode(brakeMode: BrakeMode) {
         _spark.idleMode = when (brakeMode) {
-            true -> CANSparkMax.IdleMode.kBrake
+            true  -> CANSparkMax.IdleMode.kBrake
             false -> CANSparkMax.IdleMode.kCoast
         }
     }
@@ -72,11 +78,8 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         }
     }
 
-    override var appliedOutput: Double
+    override val appliedOutput: Double
         get() = _spark.appliedOutput
-        set(value) {
-            percentOutput = value
-        }
 
     override var position: Angle
         get() {
