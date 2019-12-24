@@ -1,7 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import frc.team6502.kyberlib.math.units.rotations
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 internal class KSimulatedESCTest {
@@ -23,8 +23,8 @@ internal class KSimulatedESCTest {
         slave.percentOutput = 0.2
         slave.update()
 
-        master.followers += slave
-        master.update()
+        master += slave
+//        master.update()
 
         master.percentOutput = 0.4
         master.update()

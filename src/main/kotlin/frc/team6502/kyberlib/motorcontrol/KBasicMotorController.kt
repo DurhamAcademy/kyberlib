@@ -1,6 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj.Notifier
 import frc.team6502.kyberlib.math.invertIf
 
 abstract class KBasicMotorController {
@@ -11,6 +12,9 @@ abstract class KBasicMotorController {
             setBrakeMode(value)
         }
 
+
+    val notifier = Notifier { update() }
+
     var debug = false
 
     abstract val identifier: String
@@ -20,8 +24,15 @@ abstract class KBasicMotorController {
     var feedForward: Double = 0.0
 
     var isFollower = false
-        internal set
+        private set
     var followers: Array<KBasicMotorController> = arrayOf()
+        private set
+
+    operator fun plusAssign(kbmc: KBasicMotorController) {
+        kbmc.isFollower = true
+        kbmc.notifier.stop()
+        followers += kbmc
+    }
 
     var reversed: Boolean = false
         set(value) {
@@ -31,8 +42,11 @@ abstract class KBasicMotorController {
 
     open fun update() {
         set(percentOutput * 12 + feedForward)
+        updateFollowers()
+    }
+
+    protected fun updateFollowers() {
         for (follower in followers) {
-            follower.isFollower = true
             follower.percentOutput = appliedOutput.invertIf { follower.reversed }
             follower.update()
         }
