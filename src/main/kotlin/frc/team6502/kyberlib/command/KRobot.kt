@@ -1,4 +1,4 @@
-package frc.team6502.kyberlib
+package frc.team6502.kyberlib.command
 
 import edu.wpi.first.hal.FRCNetComm
 import edu.wpi.first.hal.HAL

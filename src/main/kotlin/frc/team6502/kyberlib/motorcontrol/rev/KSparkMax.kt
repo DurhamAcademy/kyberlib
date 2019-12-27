@@ -3,14 +3,8 @@ package frc.team6502.kyberlib.motorcontrol.rev
 import com.revrobotics.CANEncoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
-import frc.team6502.kyberlib.CANId
-import frc.team6502.kyberlib.CANKey
-import frc.team6502.kyberlib.CANRegistry
 import frc.team6502.kyberlib.math.units.*
-import frc.team6502.kyberlib.motorcontrol.BrakeMode
-import frc.team6502.kyberlib.motorcontrol.EncoderType
-import frc.team6502.kyberlib.motorcontrol.KEncoderConfig
-import frc.team6502.kyberlib.motorcontrol.KMotorController
+import frc.team6502.kyberlib.motorcontrol.*
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
 
