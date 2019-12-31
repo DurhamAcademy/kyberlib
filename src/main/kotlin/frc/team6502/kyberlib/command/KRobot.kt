@@ -13,7 +13,7 @@ open class KRobot(private val period: Double = 0.02) {
     private inner class KRobotInternal : TimedRobot(period) {
 
         override fun robotInit() {
-            HAL.report(FRCNetComm.tResourceType.kResourceType_Language, 6)
+            HAL.report(FRCNetComm.tResourceType.kResourceType_Language, FRCNetComm.tInstances.kLanguage_Kotlin)
             LiveWindow.disableAllTelemetry()
             this@KRobot.robotInit()
         }
