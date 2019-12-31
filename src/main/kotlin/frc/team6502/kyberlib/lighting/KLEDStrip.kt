@@ -2,6 +2,7 @@ package frc.team6502.kyberlib.lighting
 
 import edu.wpi.first.wpilibj.AddressableLED
 import edu.wpi.first.wpilibj.AddressableLEDBuffer
+import edu.wpi.first.wpilibj.util.Color8Bit
 
 class KLEDStrip(port: Int, private val length: Int) {
 
@@ -33,7 +34,7 @@ class KLEDStrip(port: Int, private val length: Int) {
         val mutableBuffer = KLEDRegion.composite(length, ticks, regions)
 
         for (i in mutableBuffer.indices) {
-            buffer.setLED(i, mutableBuffer[i].red, mutableBuffer[i].green, mutableBuffer[i].blue)
+            buffer.setLED(i, Color8Bit(mutableBuffer[i].red, mutableBuffer[i].green, mutableBuffer[i].blue))
         }
 
         addressableLED.setData(buffer)
