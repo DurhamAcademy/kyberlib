@@ -35,8 +35,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     // We need to add the Kotlin stdlib in order to use most Kotlin language features.
-    compile "com.kyonifer:koma-core-ejml:0.12"
-    compile "com.kyonifer:koma-plotting:0.12"
     compile "org.jetbrains.kotlin:kotlin-stdlib"
 }
 
