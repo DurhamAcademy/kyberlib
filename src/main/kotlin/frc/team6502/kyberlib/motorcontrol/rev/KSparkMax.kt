@@ -3,7 +3,7 @@ package frc.team6502.kyberlib.motorcontrol.rev
 import com.revrobotics.CANEncoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
-import frc.team6502.kyberlib.math.units.*
+import frc.team6502.kyberlib.math.units.extensions.*
 import frc.team6502.kyberlib.motorcontrol.*
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
@@ -93,7 +93,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
                 logError("Cannot get linear position without a defined radius")
                 return 0.feet
             }
-            return (_enc!!.position.rotations * radius!!) * (1/gearRatio)
+            return (_enc!!.position.rotations.toCircumference(radius!!)) * (1 / gearRatio)
         }
         set(value) {
             linearPositionSetpoint = value
@@ -117,7 +117,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
                 logError("Cannot get linear velocity without a defined radius")
                 return 0.feetPerSecond
             }
-            return _enc!!.velocity.rpm * radius!!
+            return _enc!!.velocity.rpm.toTangentialVelocity(radius!!)
         }
         set(value) {
             linearVelocitySetpoint = value

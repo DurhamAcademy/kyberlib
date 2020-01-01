@@ -1,6 +1,6 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import frc.team6502.kyberlib.math.units.rotations
+import frc.team6502.kyberlib.math.units.extensions.rotations
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

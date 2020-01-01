@@ -1,7 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.controller.PIDController
-import frc.team6502.kyberlib.math.units.*
+import frc.team6502.kyberlib.math.units.extensions.*
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
@@ -172,7 +172,7 @@ abstract class KMotorController: KBasicMotorController() {
                 logError("Cannot set linear position without a configured encoder and radius")
             } else {
                 field = value
-                positionSetpoint = value / radius!!
+                positionSetpoint = value.toAngle(radius!!)
             }
         }
 
@@ -198,7 +198,7 @@ abstract class KMotorController: KBasicMotorController() {
                 logError("Cannot set linear velocity without a configured encoder and radius")
             } else {
                 field = value
-                velocitySetpoint = value / radius!!
+                velocitySetpoint = value.toAngularVelocity(radius!!)
             }
         }
 

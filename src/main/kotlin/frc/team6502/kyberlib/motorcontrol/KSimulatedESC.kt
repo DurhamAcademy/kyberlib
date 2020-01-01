@@ -1,7 +1,6 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import frc.team6502.kyberlib.math.invertIf
-import frc.team6502.kyberlib.math.units.*
+import frc.team6502.kyberlib.math.units.extensions.*
 import kotlin.math.withSign
 
 class KSimulatedESC(val name: String, apply: KSimulatedESC.() -> Unit = {}): KMotorController() {
