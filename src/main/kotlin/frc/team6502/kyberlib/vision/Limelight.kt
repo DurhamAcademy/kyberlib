@@ -1,13 +1,25 @@
 package frc.team6502.kyberlib.vision
 
 import edu.wpi.first.networktables.NetworkTableInstance
-import kotlin.math.roundToInt
 
 /**
  * A wrapper for the limelight vision camera.
  * [table] defines the network table the data will be pulled from ("limelight" by default)
  */
-class Limelight(private val table: String = "limelight"){
+class Limelight(private val table: String = "limelight") {
+
+    enum class LedMode(val idx: Int) {
+        PIPELINE(0),
+        FORCE_OFF(1),
+        FORCE_BLINK(2),
+        FORCE_ON(3)
+    }
+
+    enum class StreamMode(val idx: Int) {
+        STANDARD(0),
+        PIP_PRIMARY(1),
+        PIP_SECONDARY(2)
+    }
 
     private val tbl = NetworkTableInstance.getDefault().getTable(table)
 
@@ -47,31 +59,83 @@ class Limelight(private val table: String = "limelight"){
     val latency
         get() = tbl.getEntry("tl").getDouble(0.0)
 
+    /**
+     * Sidelength of shortest side of the fitted bounding box (pixels)
+     */
     val short
         get() = tbl.getEntry("tshort").getDouble(0.0)
 
+    /**
+     * 	Sidelength of longest side of the fitted bounding box (pixels)
+     */
     val long
         get() = tbl.getEntry("tlong").getDouble(0.0)
 
+    /**
+     * Horizontal sidelength of the rough bounding box (0 - 320 pixels)
+     */
     val horizontal
         get() = tbl.getEntry("thor").getDouble(0.0)
 
+    /**
+     * Vertical sidelength of the rough bounding box (0 - 320 pixels)
+     */
     val vertical
         get() = tbl.getEntry("tvert").getDouble(0.0)
 
     /**
-     * The currently selected pipeline
+     * Sets limelight’s LED state
      */
-    val pipeline
+    var ledMode
+        get() = LedMode.values().find { it.idx == tbl.getEntry("ledMode").getNumber(0) } ?: LedMode.PIPELINE
+        set(value) {
+            tbl.getEntry("ledMode").setNumber(value.idx)
+        }
+
+    /**
+     * 	Sets limelight’s streaming mode
+     */
+    var stream
+        get() = StreamMode.values().find { it.idx == tbl.getEntry("stream").getNumber(0) } ?: StreamMode.STANDARD
+        set(value) {
+            tbl.getEntry("stream").setNumber(value.idx)
+        }
+
+    /**
+     * Sets limelight’s operation mode. True enables Driver Camera (Increases exposure, disables vision processing)
+     */
+    var driverMode
+        get() = tbl.getEntry("camMode").getNumber(0) == 1
+        set(value) {
+            tbl.getEntry("camMode").setNumber(if (value) 1 else 0)
+        }
+
+    /**
+     * Allows users to take snapshots during a match
+     */
+    var snapshot
+        get() = tbl.getEntry("snapshot").getNumber(0) == 1
+        set(value) {
+            tbl.getEntry("snapshot").setNumber(if (value) 1 else 0)
+        }
+
+    /**
+     * Active pipeline index of the camera (0 .. 9)
+     */
+    var pipeline
         get() = tbl.getEntry("getpipe").getDouble(0.0).toInt()
+        set(value) {
+            tbl.getEntry("pipeline").setNumber(pipeline)
+        }
 
     /**
      * 3D transform of the detected target if using PnP
      */
-    val transform: VisionTransform
+    val transform: VisionTransform?
         get() {
-            val cmt = tbl.getEntry("camtran").getDoubleArray(arrayOf(0.0,0.0,0.0,0.0,0.0,0.0))
-            return VisionTransform(cmt[0], cmt[1], cmt[2], cmt[3], cmt[4], cmt[5])
+            val entry = tbl.getEntry("camtran")
+            val cmt = if (entry.exists()) entry.getDoubleArray(arrayOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)) else null
+            return if (cmt != null) VisionTransform(cmt[0], cmt[1], cmt[2], cmt[3], cmt[4], cmt[5]) else null
         }
 }
 
