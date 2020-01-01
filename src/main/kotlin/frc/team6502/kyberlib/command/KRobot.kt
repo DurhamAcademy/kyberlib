@@ -55,25 +55,63 @@ open class KRobot(private val period: Double = 0.02) {
             diagnostics(Diagnostics.singleton!!)
             Diagnostics.singleton!!.schedule()
         }
-
     }
 
+    /**
+     * The value being wrapped by KRobot
+     */
     private val internalRobot = KRobotInternal()
 
+    /**
+     * Ran once when the robot starts up
+     */
     open fun robotInit() {}
+
+    /**
+     * Ran continuously at all times.
+     * CommandScheduler is being ran automatically, so no need to call it here.
+     */
     open fun robotPeriodic() {}
-    open fun autonomousPeriodic() {}
-    open fun autonomousInit() {}
+
+    /**
+     * Ran once when the robot is disabled
+     */
     open fun disabledInit() {}
+
+    /**
+     * Ran continuously when the robot is disabled
+     */
     open fun disabledPeriodic() {}
+
+    /**
+     * Ran once when the robot enters autonomous mode
+     */
+    open fun autonomousInit() {}
+
+    /**
+     * Ran continuously when the robot is in autonomous mode
+     */
+    open fun autonomousPeriodic() {}
+
+    /**
+     * Ran once when the robot enters teleoperated mode
+     */
     open fun teleopInit() {}
+
+    /**
+     * Ran continuously when the robot is in teleoperated mode
+     */
     open fun teleopPeriodic() {}
 
     /**
-     * Add commands to diagnostics here
+     * Ran when test mode is enabled to perform diagnostics.
+     * Add suites by doing diagnostics += DiagnosticSuite(...)
      */
     open fun diagnostics(diagnostics: Diagnostics) {}
 
+    /**
+     * Runs the underlying WPILib startup methods. Run this in Main.kt
+     */
     fun initialize() {
         RobotBase.startRobot { internalRobot }
     }

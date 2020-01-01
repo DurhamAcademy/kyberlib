@@ -3,7 +3,9 @@ package frc.team6502.kyberlib.diagnostics
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.team6502.kyberlib.command.plusAssign
 
-
+/**
+ * A group of diagnostic commands
+ */
 class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticCommand) : SequentialCommandGroup() {
 
     internal var passed = 0
@@ -26,7 +28,7 @@ class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticComm
     override fun end(interrupted: Boolean) {
         super.end(interrupted)
         var success = true
-        if(passed < commands.size) success = false
+        if (passed < commands.size) success = false
         println("[${if (success) "PASS" else "FAIL"}] Executed $passed command${if (passed != 1) "s" else ""}.")
         if (interrupted) println("[ABORTED] A command failed, so diagnostics have been canceled.")
     }
