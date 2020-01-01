@@ -1,6 +1,6 @@
 package frc.team6502.kyberlib.input
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 internal class KAxisTest {

@@ -259,8 +259,8 @@ formatting:
     active: true
     autoCorrect: true
   NoWildcardImports:
-    active: true
-    autoCorrect: true
+    active: false
+    autoCorrect: false
   PackageName:
     active: true
     autoCorrect: true
@@ -519,5 +519,5 @@ style:
   VarCouldBeVal:
     active: false
   WildcardImport:
-    active: true
+    active: false
     excludeImports: 'java.util.*,kotlinx.android.synthetic.*,kotlin.math.*'

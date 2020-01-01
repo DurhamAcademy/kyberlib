@@ -1,7 +1,6 @@
 package frc.team6502.kyberlib.input
 
 import kotlin.math.abs
-import kotlin.math.absoluteValue
 
 class KAxis(private val raw: () -> Double){
 

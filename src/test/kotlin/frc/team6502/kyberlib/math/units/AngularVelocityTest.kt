@@ -1,6 +1,8 @@
 package frc.team6502.kyberlib.math.units
 
-import org.junit.Assert.*
+import frc.team6502.kyberlib.math.units.extensions.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.PI
 
@@ -40,7 +42,7 @@ internal class AngularVelocityTest {
 
     @Test
     fun times() {
-        assertEquals(60.rpm * 6.inches, (PI).feetPerSecond)
+        assertTrue(60.rpm.toTangentialVelocity(6.inches) epsilonEquals (PI).feetPerSecond)
     }
 
 

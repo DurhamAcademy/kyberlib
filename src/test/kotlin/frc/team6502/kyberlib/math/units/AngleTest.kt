@@ -1,6 +1,8 @@
 package frc.team6502.kyberlib.math.units
 
-import org.junit.Assert.*
+import frc.team6502.kyberlib.math.units.extensions.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.PI
 
@@ -40,21 +42,22 @@ internal class AngleTest {
 
     @Test
     fun plus() {
-        assertEquals(180.degrees + 180.degrees, 360.degrees)
-        assertEquals(180.degrees + 0.degrees, 180.degrees)
+        assertTrue(180.degrees + 180.degrees epsilonEquals 360.degrees)
+        assertTrue(180.degrees + 0.degrees epsilonEquals 180.degrees)
     }
 
     @Test
     fun minus() {
-        assertEquals(10.degrees-0.degrees, 10.degrees)
-        assertEquals(0.degrees-350.degrees, 10.degrees)
-        assertEquals(0.degrees-270.degrees, 90.degrees)
+        assertTrue(10.degrees - 0.degrees epsilonEquals 10.degrees)
+        assertTrue(10.degrees - 5.degrees epsilonEquals 5.degrees)
+        assertTrue(0.degrees.subtractNearest(350.degrees) epsilonEquals 10.degrees)
+        assertTrue(0.degrees.subtractNearest(270.degrees) epsilonEquals 90.degrees)
     }
 
     @Test
-    fun times() {
-        assertEquals(360.degrees * 6.inches, 6.inches * TAU)
-        assertEquals(180.degrees * 6.inches, 3.inches * TAU)
+    fun toCircumference() {
+        assertTrue(360.degrees.toCircumference(6.inches) epsilonEquals 6.inches * TAU)
+        assertTrue(180.degrees.toCircumference(6.inches) epsilonEquals 3.inches * TAU)
     }
 
 
