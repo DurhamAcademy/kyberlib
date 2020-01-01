@@ -6,24 +6,24 @@ class CSVWriter(val filename: String) {
     private val f = File(filename)
 
     init {
-        if(f.exists()){
+        if (f.exists()) {
             f.delete()
         }
     }
 
-    fun write(vararg csvWriteables: CSVWriteable){
-        if(!f.exists()){
+    fun write(vararg csvWriteables: CSVWriteable) {
+        if (!f.exists()) {
             println("File does not exist, creating...")
             f.createNewFile()
             println("Created ${f.absolutePath}")
-            for(csvWriteable in csvWriteables.dropLast(1)){
-                f.appendText(csvWriteable.toCSVHeader()+",")
+            for (csvWriteable in csvWriteables.dropLast(1)) {
+                f.appendText(csvWriteable.toCSVHeader() + ",")
             }
-            f.appendText(csvWriteables.last().toCSVHeader()+"\n")
+            f.appendText(csvWriteables.last().toCSVHeader() + "\n")
         }
-        for(csvWriteable in csvWriteables.dropLast(1)){
-            f.appendText(csvWriteable.toCSV()+",")
+        for (csvWriteable in csvWriteables.dropLast(1)) {
+            f.appendText(csvWriteable.toCSV() + ",")
         }
-        f.appendText(csvWriteables.last().toCSV()+"\n")
+        f.appendText(csvWriteables.last().toCSV() + "\n")
     }
 }

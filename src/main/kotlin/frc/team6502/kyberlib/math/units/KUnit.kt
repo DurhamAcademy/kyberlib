@@ -21,4 +21,3 @@ inline class KUnit<T>(val value: Double) : Comparable<KUnit<T>> {
 
 operator fun <T : KUnitKey, U : KUnitKey> KUnit<T>.times(other: KUnit<U>) = KUnit<Mul<T, U>>(value * other.value)
 operator fun <T : KUnitKey, U : KUnitKey> KUnit<T>.div(other: KUnit<U>) = KUnit<Div<T, U>>(value * other.value)
-

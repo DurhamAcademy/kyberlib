@@ -1,6 +1,6 @@
 package frc.team6502.kyberlib.math
 
-import edu.wpi.first.wpilibj.RobotBase.*
+import edu.wpi.first.wpilibj.RobotBase.isReal
 import edu.wpi.first.wpilibj.Timer
 
 class Differentiator {
