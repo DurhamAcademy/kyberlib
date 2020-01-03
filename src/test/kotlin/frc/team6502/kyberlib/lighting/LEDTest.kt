@@ -7,9 +7,9 @@ import frc.team6502.kyberlib.lighting.animations.AnimationRGBRain
 import frc.team6502.kyberlib.lighting.animations.AnimationRGBWave
 import frc.team6502.kyberlib.lighting.animations.AnimationRain
 import frc.team6502.kyberlib.lighting.animations.AnimationSolid
+import java.awt.Color
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.awt.Color
 
 class LEDTest {
 
@@ -62,19 +62,23 @@ class LEDTest {
 
     @Test
     fun testOpaqueComposite() {
-        val buf = KLEDRegion.composite(32, 0, listOf(
+        val buf = KLEDRegion.composite(
+            32, 0, listOf(
                 KLEDRegion(AnimationSolid(Color.red), 0, 32),
                 KLEDRegion(AnimationSolid(Color.blue), 0, 16)
-        ))
+            )
+        )
         assertEquals(Color.blue, buf[5])
     }
 
     @Test
     fun testTransparentComposite() {
-        val buf = KLEDRegion.composite(32, 0, listOf(
+        val buf = KLEDRegion.composite(
+            32, 0, listOf(
                 KLEDRegion(AnimationSolid(Color(255, 0, 0)), 0, 32, false),
                 KLEDRegion(AnimationSolid(Color(0, 255, 0, 127)), 0, 16, true)
-        ))
+            )
+        )
         assertEquals(Color(128, 127, 0), buf[5])
     }
 }

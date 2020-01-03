@@ -8,10 +8,10 @@ import frc.team6502.kyberlib.math.units.extensions.radians
 import frc.team6502.kyberlib.math.units.extensions.rotations
 import frc.team6502.kyberlib.math.units.extensions.subtractNearest
 import frc.team6502.kyberlib.math.units.extensions.toCircumference
+import kotlin.math.PI
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.PI
 
 internal class AngleTest {
     val sigma = 0.001

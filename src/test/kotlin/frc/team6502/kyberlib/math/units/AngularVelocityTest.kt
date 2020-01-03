@@ -7,10 +7,10 @@ import frc.team6502.kyberlib.math.units.extensions.inches
 import frc.team6502.kyberlib.math.units.extensions.radiansPerSecond
 import frc.team6502.kyberlib.math.units.extensions.rpm
 import frc.team6502.kyberlib.math.units.extensions.toTangentialVelocity
+import kotlin.math.PI
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.PI
 
 internal class AngularVelocityTest {
     val sigma = 0.001
