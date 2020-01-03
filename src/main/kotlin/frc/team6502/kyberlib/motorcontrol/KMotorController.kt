@@ -226,7 +226,7 @@ abstract class KMotorController : KBasicMotorController() {
                 val output = pidController.calculate(velocity.rpm, velocitySetpoint.rpm)
                 set(output * 12.0 + feedForward)
             }
-            else                    -> {
+            else -> {
                 // don't use PID
                 set(percentOutput * 12 + feedForward)
             }

@@ -37,7 +37,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     private val _spark = CANSparkMax(canId, when (motorType) {
         BRUSHLESS -> MotorType.kBrushless
-        BRUSHED   -> MotorType.kBrushed
+        BRUSHED -> MotorType.kBrushed
     })
 
     private var _enc: CANEncoder? = null
@@ -60,7 +60,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override fun setBrakeMode(brakeMode: BrakeMode) {
         _spark.idleMode = when (brakeMode) {
-            true  -> CANSparkMax.IdleMode.kBrake
+            true -> CANSparkMax.IdleMode.kBrake
             false -> CANSparkMax.IdleMode.kCoast
         }
     }
@@ -81,7 +81,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
                 _enc?.inverted = config.reversed
                 true
             }
-            else                                                          -> {
+            else -> {
                 false
             }
         }

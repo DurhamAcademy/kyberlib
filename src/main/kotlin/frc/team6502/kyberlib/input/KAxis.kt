@@ -15,9 +15,9 @@ class KAxis(private val raw: () -> Double) {
 
             // apply deadband
             command = when {
-                command > deadband  -> (1 / (1 - deadband)) * command - (deadband / (1 - deadband))
+                command > deadband -> (1 / (1 - deadband)) * command - (deadband / (1 - deadband))
                 command < -deadband -> (1 / (1 - deadband)) * command + (deadband / (1 - deadband))
-                else                -> 0.0
+                else -> 0.0
             }
 
             var retval = ((1 + 0.01 * expo * (command * command - 1.0)) * command)
