@@ -7,7 +7,6 @@ import frc.team6502.kyberlib.KyberlibConfig
 import frc.team6502.kyberlib.math.geometry.KPose2d
 import java.io.File
 
-
 class KTrajectory(val name: String, val waypoints: List<KPose2d>, val config: KTrajectoryConfig) {
 
     val wpiTrajectory: Trajectory

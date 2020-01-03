@@ -12,7 +12,6 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
             val alpha = sqrt((1 + (it % dropLength)) / dropLength.toFloat())
             Color(1F, 1F, 1F, alpha)
         }.toMutableList()
-
     }
 
     fun constructRGBBuffer(length: Int): MutableList<Color> {
@@ -51,5 +50,4 @@ class AnimationRGBRain(private val cycles: Double = 1.0, private val dropLength:
 
         return trimmed
     }
-
 }

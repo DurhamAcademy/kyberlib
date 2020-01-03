@@ -1,7 +1,16 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.controller.PIDController
-import frc.team6502.kyberlib.math.units.extensions.*
+import frc.team6502.kyberlib.math.units.extensions.Angle
+import frc.team6502.kyberlib.math.units.extensions.AngularVelocity
+import frc.team6502.kyberlib.math.units.extensions.Length
+import frc.team6502.kyberlib.math.units.extensions.LinearVelocity
+import frc.team6502.kyberlib.math.units.extensions.meters
+import frc.team6502.kyberlib.math.units.extensions.metersPerSecond
+import frc.team6502.kyberlib.math.units.extensions.rotations
+import frc.team6502.kyberlib.math.units.extensions.rpm
+import frc.team6502.kyberlib.math.units.extensions.toAngle
+import frc.team6502.kyberlib.math.units.extensions.toAngularVelocity
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
@@ -35,7 +44,7 @@ data class KEncoderConfig(val cpr: Int, val type: EncoderType, val reversed: Boo
 /**
  * A more advanced motor control with feedback control.
  */
-abstract class KMotorController: KBasicMotorController() {
+abstract class KMotorController : KBasicMotorController() {
 
     /**
      * The motor controller's PID controller. Runs rio-side.
@@ -225,7 +234,6 @@ abstract class KMotorController: KBasicMotorController() {
 
         updateFollowers()
     }
-
 
     /**
      * Resets the encoder's position to zero

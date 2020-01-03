@@ -28,5 +28,4 @@ internal class KAxisTest {
         println(axis.value)
         assertEquals(axis.value, 1.0, 0.05)
     }
-
 }

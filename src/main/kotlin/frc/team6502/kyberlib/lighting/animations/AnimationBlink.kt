@@ -13,5 +13,4 @@ class AnimationBlink(val color: Color, val ticksPerCycle: Int) : LEDAnimation() 
             Color(color.red / 255F, color.green / 255F, color.blue / 255F, brightness.toFloat())
         }.toMutableList()
     }
-
 }

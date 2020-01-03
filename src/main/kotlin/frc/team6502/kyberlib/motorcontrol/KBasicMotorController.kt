@@ -18,7 +18,6 @@ abstract class KBasicMotorController {
             setBrakeMode(value)
         }
 
-
     val notifier = Notifier { update() }
 
     /**

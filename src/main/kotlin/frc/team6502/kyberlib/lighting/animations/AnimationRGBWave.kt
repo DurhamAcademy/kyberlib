@@ -30,5 +30,4 @@ class AnimationRGBWave(private val cycles: Double = 1.0, val ticksPerMovement: I
 
         return b.take(length)
     }
-
 }

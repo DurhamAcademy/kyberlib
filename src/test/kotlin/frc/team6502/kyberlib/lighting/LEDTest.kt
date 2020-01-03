@@ -1,6 +1,12 @@
 package frc.team6502.kyberlib.lighting
 
-import frc.team6502.kyberlib.lighting.animations.*
+import frc.team6502.kyberlib.lighting.animations.AnimationBlink
+import frc.team6502.kyberlib.lighting.animations.AnimationPulse
+import frc.team6502.kyberlib.lighting.animations.AnimationRGBFade
+import frc.team6502.kyberlib.lighting.animations.AnimationRGBRain
+import frc.team6502.kyberlib.lighting.animations.AnimationRGBWave
+import frc.team6502.kyberlib.lighting.animations.AnimationRain
+import frc.team6502.kyberlib.lighting.animations.AnimationSolid
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.awt.Color
@@ -24,34 +30,34 @@ class LEDTest {
     @Test
     fun testPulse() {
         val buf = KLEDRegion(AnimationPulse(Color.red, 10), 0, 32).getBuffer(0)!!
-        //TODO
+        // TODO
     }
 
     @Test
     fun testRain() {
         val buf = KLEDRegion(AnimationRain(Color.decode("#ff5d73"), 10, 10), 0, 32).getBuffer(0)!!
-        //TODO
+        // TODO
     }
 
     @Test
     fun testRGBRain() {
         val buf = KLEDRegion(AnimationRGBRain(0.1, 10, 10), 0, 32).getBuffer(0)!!
         val buf2 = KLEDRegion(AnimationRGBRain(2.0, 10, 10), 0, 32).getBuffer(0)!!
-        //TODO
+        // TODO
     }
 
     @Test
     fun testWave() {
         val buf = KLEDRegion(AnimationRGBWave(0.5, 10), 0, 32).getBuffer(0)!!
         val buf2 = KLEDRegion(AnimationRGBWave(2.0, 10), 0, 32).getBuffer(0)!!
-        //TODO
+        // TODO
     }
 
     @Test
     fun testFade() {
         val buf = KLEDRegion(AnimationRGBFade(10), 0, 32).getBuffer(0)!!
         assertEquals(Color.red, buf[0])
-        //TODO
+        // TODO
     }
 
     @Test
@@ -71,6 +77,4 @@ class LEDTest {
         ))
         assertEquals(Color(128, 127, 0), buf[5])
     }
-
-
 }

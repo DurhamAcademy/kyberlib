@@ -45,7 +45,6 @@ internal class KSimulatedESCTest {
         slave.reversed = true
         master.update()
         assertEquals("Both reversed", 0.4, slave.appliedOutput, 0.01)
-
     }
 
     @Test
@@ -64,7 +63,5 @@ internal class KSimulatedESCTest {
         sim.update()
 
         assertEquals(0.0, sim.appliedOutput, 0.01)
-
     }
-
 }

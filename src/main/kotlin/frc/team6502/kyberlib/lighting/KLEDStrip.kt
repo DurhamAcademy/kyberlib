@@ -41,5 +41,4 @@ class KLEDStrip(port: Int, private val length: Int) {
 
         ticks++
     }
-
 }

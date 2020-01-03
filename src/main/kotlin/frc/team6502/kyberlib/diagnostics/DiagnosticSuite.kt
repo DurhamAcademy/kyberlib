@@ -32,5 +32,4 @@ class DiagnosticSuite(val suiteName: String, vararg val commands: DiagnosticComm
         println("[${if (success) "PASS" else "FAIL"}] Executed $passed command${if (passed != 1) "s" else ""}.")
         if (interrupted) println("[ABORTED] A command failed, so diagnostics have been canceled.")
     }
-
 }

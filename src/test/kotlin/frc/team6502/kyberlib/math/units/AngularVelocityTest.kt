@@ -1,11 +1,16 @@
 package frc.team6502.kyberlib.math.units
 
-import frc.team6502.kyberlib.math.units.extensions.*
+import frc.team6502.kyberlib.math.units.extensions.degreesPerSecond
+import frc.team6502.kyberlib.math.units.extensions.encoderVelocity
+import frc.team6502.kyberlib.math.units.extensions.feetPerSecond
+import frc.team6502.kyberlib.math.units.extensions.inches
+import frc.team6502.kyberlib.math.units.extensions.radiansPerSecond
+import frc.team6502.kyberlib.math.units.extensions.rpm
+import frc.team6502.kyberlib.math.units.extensions.toTangentialVelocity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.PI
-
 
 internal class AngularVelocityTest {
     val sigma = 0.001
@@ -13,16 +18,16 @@ internal class AngularVelocityTest {
     @Test
     fun getRadiansPerSecond() {
         assertEquals(0.degreesPerSecond.radiansPerSecond, 0.0, sigma)
-        assertEquals(90.degreesPerSecond.radiansPerSecond, PI/2, sigma)
+        assertEquals(90.degreesPerSecond.radiansPerSecond, PI / 2, sigma)
         assertEquals(180.degreesPerSecond.radiansPerSecond, PI, sigma)
-        assertEquals(360.degreesPerSecond.radiansPerSecond, PI*2, sigma)
+        assertEquals(360.degreesPerSecond.radiansPerSecond, PI * 2, sigma)
     }
 
     @Test
     fun getDegreesPerSecond() {
         assertEquals(0.radiansPerSecond.degreesPerSecond, 0.0, sigma)
         assertEquals(PI.radiansPerSecond.degreesPerSecond, 180.0, sigma)
-        assertEquals((PI*2).radiansPerSecond.degreesPerSecond, 360.0, sigma)
+        assertEquals((PI * 2).radiansPerSecond.degreesPerSecond, 360.0, sigma)
     }
 
     @Test
@@ -44,6 +49,4 @@ internal class AngularVelocityTest {
     fun times() {
         assertTrue(60.rpm.toTangentialVelocity(6.inches) epsilonEquals (PI).feetPerSecond)
     }
-
-
 }

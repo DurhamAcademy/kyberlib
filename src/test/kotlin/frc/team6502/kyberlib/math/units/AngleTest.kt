@@ -1,11 +1,17 @@
 package frc.team6502.kyberlib.math.units
 
-import frc.team6502.kyberlib.math.units.extensions.*
+import frc.team6502.kyberlib.math.units.extensions.TAU
+import frc.team6502.kyberlib.math.units.extensions.degrees
+import frc.team6502.kyberlib.math.units.extensions.encoderAngle
+import frc.team6502.kyberlib.math.units.extensions.inches
+import frc.team6502.kyberlib.math.units.extensions.radians
+import frc.team6502.kyberlib.math.units.extensions.rotations
+import frc.team6502.kyberlib.math.units.extensions.subtractNearest
+import frc.team6502.kyberlib.math.units.extensions.toCircumference
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.PI
-
 
 internal class AngleTest {
     val sigma = 0.001
@@ -13,16 +19,16 @@ internal class AngleTest {
     @Test
     fun getRadians() {
         assertEquals(0.degrees.radians, 0.0, sigma)
-        assertEquals(90.degrees.radians, PI/2, sigma)
+        assertEquals(90.degrees.radians, PI / 2, sigma)
         assertEquals(180.degrees.radians, PI, sigma)
-        assertEquals(360.degrees.radians, PI*2, sigma)
+        assertEquals(360.degrees.radians, PI * 2, sigma)
     }
 
     @Test
     fun getDegrees() {
         assertEquals(0.radians.degrees, 0.0, sigma)
         assertEquals(PI.radians.degrees, 180.0, sigma)
-        assertEquals((PI*2).radians.degrees, 360.0, sigma)
+        assertEquals((PI * 2).radians.degrees, 360.0, sigma)
     }
 
     @Test
@@ -59,6 +65,4 @@ internal class AngleTest {
         assertTrue(360.degrees.toCircumference(6.inches) epsilonEquals 6.inches * TAU)
         assertTrue(180.degrees.toCircumference(6.inches) epsilonEquals 3.inches * TAU)
     }
-
-
 }

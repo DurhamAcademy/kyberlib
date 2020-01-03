@@ -3,8 +3,23 @@ package frc.team6502.kyberlib.motorcontrol.rev
 import com.revrobotics.CANEncoder
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel.MotorType
-import frc.team6502.kyberlib.math.units.extensions.*
-import frc.team6502.kyberlib.motorcontrol.*
+import frc.team6502.kyberlib.math.units.extensions.Angle
+import frc.team6502.kyberlib.math.units.extensions.AngularVelocity
+import frc.team6502.kyberlib.math.units.extensions.Length
+import frc.team6502.kyberlib.math.units.extensions.LinearVelocity
+import frc.team6502.kyberlib.math.units.extensions.feet
+import frc.team6502.kyberlib.math.units.extensions.feetPerSecond
+import frc.team6502.kyberlib.math.units.extensions.rotations
+import frc.team6502.kyberlib.math.units.extensions.rpm
+import frc.team6502.kyberlib.math.units.extensions.toCircumference
+import frc.team6502.kyberlib.math.units.extensions.toTangentialVelocity
+import frc.team6502.kyberlib.motorcontrol.BrakeMode
+import frc.team6502.kyberlib.motorcontrol.CANId
+import frc.team6502.kyberlib.motorcontrol.CANKey
+import frc.team6502.kyberlib.motorcontrol.CANRegistry
+import frc.team6502.kyberlib.motorcontrol.EncoderType
+import frc.team6502.kyberlib.motorcontrol.KEncoderConfig
+import frc.team6502.kyberlib.motorcontrol.KMotorController
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHED
 import frc.team6502.kyberlib.motorcontrol.MotorType.BRUSHLESS
 
@@ -105,7 +120,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
                 logError("Cannot set velocity without a configured encoder")
                 return 0.rpm
             }
-            return _enc!!.velocity.rpm * (1/gearRatio)
+            return _enc!!.velocity.rpm * (1 / gearRatio)
         }
         set(value) {
             velocitySetpoint = value
@@ -129,5 +144,4 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         }
         _enc?.position = 0.0
     }
-
 }

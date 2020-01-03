@@ -12,7 +12,6 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
             val alpha = sqrt((1 + (it % dropLength)) / dropLength.toFloat())
             Color(color.red / 255F, color.green / 255F, color.blue / 255F, alpha)
         }.toMutableList()
-
     }
 
     override fun getBuffer(ticks: Int, length: Int): List<Color> {
@@ -26,5 +25,4 @@ class AnimationRain(private val color: Color, private val dropLength: Int, val t
 
         return b.take(length)
     }
-
 }

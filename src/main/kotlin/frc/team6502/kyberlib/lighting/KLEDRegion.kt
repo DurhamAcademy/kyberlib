@@ -40,5 +40,4 @@ class KLEDRegion(val animation: LEDAnimation, val start: Int, val end: Int, val 
 
         return buf
     }
-
 }

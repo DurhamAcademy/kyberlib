@@ -3,7 +3,7 @@ package frc.team6502.kyberlib.diagnostics
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.CommandBase
 
-abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 0.0): CommandBase() {
+abstract class DiagnosticCommand(val commandName: String, val timeout: Double = 0.0) : CommandBase() {
 
     internal lateinit var suite: DiagnosticSuite
     var indexInSuite = 0
