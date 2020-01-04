@@ -42,6 +42,8 @@ class KTrajectory(val name: String, val waypoints: List<KPose2d>, val config: KT
             jsonFile.writeText(TrajectoryUtil.serializeTrajectory(wpiTrajectory))
             hashFile.writeText(hashTrajectory().toString())
         }
+
+        TrajectoryManager.trajectories[name] = this
         println("Trajectory $name loaded!")
     }
 
