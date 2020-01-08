@@ -73,7 +73,6 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         return when {
             config.type == EncoderType.NEO_HALL && motorType == BRUSHLESS -> {
                 _enc = _spark.encoder
-                _enc?.inverted = config.reversed
                 true
             }
             config.type == EncoderType.QUADRATURE && motorType == BRUSHED -> {
@@ -92,7 +91,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override var position: Angle
         get() {
-            if (!closedLoopConfigured) {
+            if (!encoderConfigured) {
                 logError("Cannot get position without a configured encoder")
                 return 0.rotations
             }
@@ -116,7 +115,7 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override var velocity: AngularVelocity
         get() {
-            if (!closedLoopConfigured) {
+            if (!encoderConfigured) {
                 logError("Cannot set velocity without a configured encoder")
                 return 0.rpm
             }
