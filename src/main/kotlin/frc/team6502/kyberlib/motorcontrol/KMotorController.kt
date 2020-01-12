@@ -1,6 +1,7 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import frc.team6502.kyberlib.math.units.extensions.*
+import sun.jvm.hotspot.oops.CellTypeState.value
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
@@ -100,6 +101,15 @@ abstract class KMotorController : KBasicMotorController() {
         set(value) {
             field = value
             writePid(kP, kI, kD)
+        }
+
+    /**
+     * Sets a current limit for the motor
+     */
+    var currentLimit: Int = 40
+        set(value) {
+            field = value
+            writeCurrentLimit(value)
         }
 
     var position: Angle
@@ -211,6 +221,8 @@ abstract class KMotorController : KBasicMotorController() {
     protected abstract fun readPosition(): Angle
 
     protected abstract fun readVelocity(): AngularVelocity
+
+    protected abstract fun writeCurrentLimit(limit: Int)
 
     /**
      * Resets the encoder's position to zero

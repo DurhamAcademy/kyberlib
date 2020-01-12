@@ -97,6 +97,10 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
 
     override fun readVelocity() = _enc!!.velocity.rpm
 
+    override fun writeCurrentLimit(limit: Int) {
+        _spark.setSmartCurrentLimit(limit)
+    }
+
     override fun followTarget(kmc: KBasicMotorController) {
         if (kmc is KSparkMax) {
             _spark.follow(kmc._spark, reversed)
