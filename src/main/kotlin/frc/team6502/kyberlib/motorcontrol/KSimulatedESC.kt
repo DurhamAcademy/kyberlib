@@ -55,7 +55,7 @@ class KSimulatedESC(val name: String, apply: KSimulatedESC.() -> Unit = {}) : KM
     override fun readPosition(): Angle = pos
 
     override fun readVelocity(): AngularVelocity = vel
-    
+
     override fun writeCurrentLimit(limit: Int) { }
 
     override fun zeroPosition() {

@@ -1,7 +1,6 @@
 package frc.team6502.kyberlib.motorcontrol
 
 import frc.team6502.kyberlib.math.units.extensions.*
-import sun.jvm.hotspot.oops.CellTypeState.value
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
