@@ -3,6 +3,7 @@ package frc.team6502.kyberlib.motorcontrol
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Notifier
 import frc.team6502.kyberlib.math.invertIf
+import java.util.function.DoubleSupplier
 
 /**
  * A basic motor controller.
@@ -15,7 +16,7 @@ abstract class KBasicMotorController {
     var brakeMode: BrakeMode = false
         set(value) {
             field = value
-            setBrakeMode(value)
+            writeBrakeMode(value)
         }
 
     val notifier = Notifier { update() }
@@ -33,35 +34,40 @@ abstract class KBasicMotorController {
     /**
      * What percent output is currently being applied?
      */
-    abstract val appliedOutput: Double
+    val appliedOutput: Double
+        get() = readPercent()
 
     /**
      * Sets the percentage of vBus that should be output to the motor (open-loop)
      */
-    abstract var percentOutput: Double
+    var percentOutput: Double = 0.0
+        set(value) {
+            field = value
+            writePercent(value)
+        }
 
     /**
      * Sets an additional arbitrary feedforward to be added to whatever the motor should normally output
      */
-    var feedForward: Double = 0.0
+    var feedForward: DoubleSupplier? = null
 
     /**
      * True if this motor is following another.
      */
     var isFollower = false
-        internal set
+        protected set
 
-    /**
-     * Motors following this one
-     */
-    var followers: Array<KBasicMotorController> = arrayOf()
-        private set
-
-    operator fun plusAssign(kbmc: KBasicMotorController) {
-        kbmc.isFollower = true
-        kbmc.notifier.stop()
-        followers += kbmc
+    operator fun plusAssign(kmc: KBasicMotorController) {
+        kmc.follow(this)
     }
+
+    internal val followers = arrayListOf<KBasicMotorController>()
+    fun follow(kmc: KBasicMotorController) {
+        isFollower = true
+        followTarget(kmc)
+    }
+
+    protected abstract fun followTarget(kmc: KBasicMotorController)
 
     /**
      * Determines if the motor should run in the opposite direction
@@ -69,14 +75,13 @@ abstract class KBasicMotorController {
     var reversed: Boolean = false
         set(value) {
             field = value
-            setReversed(value)
+            writeReversed(value)
         }
 
     /**
      * Internal update function
      */
-    open fun update() {
-        set(percentOutput * 12 + feedForward)
+    fun update() {
         updateFollowers()
     }
 
@@ -90,17 +95,19 @@ abstract class KBasicMotorController {
     /**
      * Enables or disables the respective motor controller's braking.
      */
-    internal abstract fun setBrakeMode(brakeMode: BrakeMode)
+    protected abstract fun writeBrakeMode(brakeMode: BrakeMode)
 
     /**
      * Sets the internal reversal of the respective motor controller
      */
-    internal abstract fun setReversed(reversed: Boolean)
+    protected abstract fun writeReversed(reversed: Boolean)
 
     /**
      * Sends a raw voltage to the respective motor controller
      */
-    internal abstract fun set(value: Double)
+    internal abstract fun writePercent(value: Double)
+
+    protected abstract fun readPercent(): Double
 
     /**
      * Logs an error to the driver station window

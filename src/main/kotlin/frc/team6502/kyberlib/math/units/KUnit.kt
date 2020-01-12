@@ -11,6 +11,7 @@ inline class KUnit<T>(val value: Double) : Comparable<KUnit<T>> {
     operator fun plus(other: KUnit<T>) = KUnit<T>(value + other.value)
     operator fun minus(other: KUnit<T>) = KUnit<T>(value - other.value)
     operator fun times(other: Double) = KUnit<T>(value * other)
+    operator fun div(other: Double) = KUnit<T>(value / other)
     operator fun div(other: KUnit<T>) = value / other.value
 
     val absoluteValue get() = KUnit<T>(value.absoluteValue)

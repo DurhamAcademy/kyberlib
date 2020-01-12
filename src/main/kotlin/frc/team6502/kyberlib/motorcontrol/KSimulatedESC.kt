@@ -1,49 +1,82 @@
 package frc.team6502.kyberlib.motorcontrol
 
+import edu.wpi.first.wpilibj.controller.PIDController
+import frc.team6502.kyberlib.math.invertIf
 import frc.team6502.kyberlib.math.units.extensions.Angle
 import frc.team6502.kyberlib.math.units.extensions.AngularVelocity
-import frc.team6502.kyberlib.math.units.extensions.Length
-import frc.team6502.kyberlib.math.units.extensions.LinearVelocity
-import frc.team6502.kyberlib.math.units.extensions.degrees
-import frc.team6502.kyberlib.math.units.extensions.meters
-import frc.team6502.kyberlib.math.units.extensions.metersPerSecond
+import frc.team6502.kyberlib.math.units.extensions.rotations
 import frc.team6502.kyberlib.math.units.extensions.rpm
-import kotlin.math.withSign
 
 class KSimulatedESC(val name: String, apply: KSimulatedESC.() -> Unit = {}) : KMotorController() {
+
+    private val posController = PIDController(0.0, 0.0, 0.0)
+    private val velController = PIDController(0.0, 0.0, 0.0)
+
+    var currentPos = 0.rotations
+    set(value) {
+        field = value
+        percent = posController.calculate(currentPos.rotations, pos.rotations) + (feedForward?.asDouble?.div(12.0) ?: 0.0)
+    }
+    var currentVel = 0.rpm
+        set(value) {
+            field = value
+            percent = velController.calculate(currentVel.rpm, vel.rpm) + (feedForward?.asDouble?.div(12.0) ?: 0.0)
+        }
+    private var pos = 0.rotations
+    private var vel = 0.rpm
+
+    private var percent = 0.0
 
     init {
         this.apply(apply)
     }
 
-    override var appliedOutput: Double = 0.0
+    override fun writePid(p: Double, i: Double, d: Double) {
+        println(posController)
+        posController.p = p
+        posController.i = i
+        posController.d = d
+    }
 
-    override var position: Angle = 0.degrees
+    override fun writePosition(position: Angle) {
+        pos = position
+        vel = 0.rpm
+        currentVel = 0.rpm
+        percent = posController.calculate(currentPos.rotations, pos.rotations) + (feedForward?.asDouble?.div(12.0) ?: 0.0)
+    }
 
-    override var linearPosition: Length = 0.meters
+    override fun writeVelocity(vel: AngularVelocity) {
+        pos = 0.rotations
+        currentPos = 0.rotations
+        this.vel = vel
+        percent = velController.calculate(currentVel.rpm, currentVel.rpm) + (feedForward?.asDouble?.div(12.0) ?: 0.0)
+    }
 
-    override var velocity: AngularVelocity = 0.rpm
+    override fun readPosition(): Angle = pos
 
-    override var linearVelocity: LinearVelocity = 0.metersPerSecond
+    override fun readVelocity(): AngularVelocity = vel
 
     override fun zeroPosition() {
-        position = 0.degrees
+        pos = 0.rotations
     }
 
-    override fun configureEncoder(config: KEncoderConfig): Boolean {
-        return true
+    override fun configureEncoder(config: KEncoderConfig) = true
+
+    override val identifier = "sim"
+
+    override fun followTarget(kmc: KBasicMotorController) {
+        kmc.followers.add(this)
+        kmc.notifier.startPeriodic(0.005)
     }
 
-    override val identifier
-        get() = name
+    override fun writeBrakeMode(brakeMode: BrakeMode) { }
 
-    override fun setBrakeMode(brakeMode: BrakeMode) {
+    override fun writeReversed(reversed: Boolean) { }
+
+    override fun writePercent(value: Double) {
+        percent = value + (feedForward?.asDouble?.div(12.0) ?: 0.0)
+        percent = percent.invertIf { reversed && !isFollower }
     }
 
-    override fun setReversed(reversed: Boolean) {
-    }
-
-    override fun set(value: Double) {
-        appliedOutput = (value / 12.0).withSign(value * if (reversed && !isFollower) -1 else 1)
-    }
+    override fun readPercent() = percent
 }

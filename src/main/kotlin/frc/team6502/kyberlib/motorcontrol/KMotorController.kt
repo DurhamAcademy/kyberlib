@@ -1,16 +1,6 @@
 package frc.team6502.kyberlib.motorcontrol
 
-import edu.wpi.first.wpilibj.controller.PIDController
-import frc.team6502.kyberlib.math.units.extensions.Angle
-import frc.team6502.kyberlib.math.units.extensions.AngularVelocity
-import frc.team6502.kyberlib.math.units.extensions.Length
-import frc.team6502.kyberlib.math.units.extensions.LinearVelocity
-import frc.team6502.kyberlib.math.units.extensions.meters
-import frc.team6502.kyberlib.math.units.extensions.metersPerSecond
-import frc.team6502.kyberlib.math.units.extensions.rotations
-import frc.team6502.kyberlib.math.units.extensions.rpm
-import frc.team6502.kyberlib.math.units.extensions.toAngle
-import frc.team6502.kyberlib.math.units.extensions.toAngularVelocity
+import frc.team6502.kyberlib.math.units.extensions.*
 
 typealias GearRatio = Double
 typealias BrakeMode = Boolean
@@ -20,13 +10,6 @@ typealias BrakeMode = Boolean
  */
 enum class EncoderType {
     NONE, NEO_HALL, QUADRATURE
-}
-
-/**
- * Different methods of motor control
- */
-enum class ClosedLoopMode {
-    VELOCITY, POSITION, NONE
 }
 
 /**
@@ -45,11 +28,6 @@ data class KEncoderConfig(val cpr: Int, val type: EncoderType, val reversed: Boo
  * A more advanced motor control with feedback control.
  */
 abstract class KMotorController : KBasicMotorController() {
-
-    /**
-     * The motor controller's PID controller. Runs rio-side.
-     */
-    protected val pidController = PIDController(0.0, 0.0, 0.0)
 
     /**
      * Does the motor controller have a rotational to linear motion conversion defined? (i.e. wheel radius)
@@ -72,12 +50,6 @@ abstract class KMotorController : KBasicMotorController() {
         get() = encoderConfigured && (kP != 0.0 || kI != 0.0 || kD != 0.0)
 
     /**
-     * The current closed loop mode (position, velocity, or none.)
-     * Determines what inputs the PID controller takes
-     */
-    private var closedLoopMode = ClosedLoopMode.NONE
-
-    /**
      * Settings relevant to the motor controller's encoder.
      */
     var encoderConfig: KEncoderConfig = KEncoderConfig(0, EncoderType.NONE)
@@ -94,7 +66,7 @@ abstract class KMotorController : KBasicMotorController() {
      */
     var radius: Length? = null
         set(value) {
-            linearConfigured = true
+            linearConfigured = value != null
             field = value
         }
 
@@ -109,7 +81,7 @@ abstract class KMotorController : KBasicMotorController() {
     var kP: Double = 0.0
         set(value) {
             field = value
-            pidController.p = value
+            writePid(kP, kI, kD)
         }
 
     /**
@@ -118,7 +90,7 @@ abstract class KMotorController : KBasicMotorController() {
     var kI: Double = 0.0
         set(value) {
             field = value
-            pidController.i = value
+            writePid(kP, kI, kD)
         }
 
     /**
@@ -127,36 +99,55 @@ abstract class KMotorController : KBasicMotorController() {
     var kD: Double = 0.0
         set(value) {
             field = value
-            pidController.d = value
+            writePid(kP, kI, kD)
         }
 
-    /**
-     * The current position of the motor
-     */
-    abstract var position: Angle
-
-    /**
-     * The current linear position of the motor
-     */
-    abstract var linearPosition: Length
-
-    /**
-     * The current velocity of the motor
-     */
-    abstract var velocity: AngularVelocity
-
-    /**
-     * The current linear velocity of the motor
-     */
-    abstract var linearVelocity: LinearVelocity
-
-    /**
-     * Sets the percentage of vBus that should be output to the motor (open-loop)
-     */
-    override var percentOutput: Double = 0.0
+    var position: Angle
+        get() {
+            if (!encoderConfigured) {
+                logError("Cannot get position without a configured encoder")
+                return 0.rotations
+            }
+            return readPosition() / gearRatio
+        }
         set(value) {
-            closedLoopMode = ClosedLoopMode.NONE
-            field = value
+            positionSetpoint = value
+        }
+
+    var linearPosition: Length
+        get() {
+            if (!linearConfigured) {
+                logError("Cannot get linear position without a defined radius")
+                return 0.feet
+            }
+            return readPosition().toCircumference(radius!!) / gearRatio
+        }
+        set(value) {
+            linearPositionSetpoint = value
+        }
+
+    var velocity: AngularVelocity
+        get() {
+            if (!encoderConfigured) {
+                logError("Cannot get velocity without a configured encoder")
+                return 0.rpm
+            }
+            return readVelocity() / gearRatio
+        }
+        set(value) {
+            velocitySetpoint = value
+        }
+
+    var linearVelocity: LinearVelocity
+        get() {
+            if (!linearConfigured) {
+                logError("Cannot get linear velocity without a defined radius")
+                return 0.feetPerSecond
+            }
+            return readVelocity().toTangentialVelocity(radius!!)
+        }
+        set(value) {
+            linearVelocitySetpoint = value
         }
 
     /**
@@ -167,8 +158,8 @@ abstract class KMotorController : KBasicMotorController() {
             if (!encoderConfigured) {
                 logError("Cannot set position without a configured encoder")
             } else {
-                closedLoopMode = ClosedLoopMode.POSITION
                 field = value
+                writePosition(value)
             }
         }
 
@@ -178,7 +169,7 @@ abstract class KMotorController : KBasicMotorController() {
     var linearPositionSetpoint: Length = 0.meters
         set(value) {
             if (!encoderConfigured || !linearConfigured) {
-                logError("Cannot set linear position without a configured encoder and radius")
+                logError("Cannot set linear position without a defined radius")
             } else {
                 field = value
                 positionSetpoint = value.toAngle(radius!!)
@@ -193,8 +184,8 @@ abstract class KMotorController : KBasicMotorController() {
             if (!encoderConfigured) {
                 logError("Cannot set velocity without a configured encoder")
             } else {
-                closedLoopMode = ClosedLoopMode.VELOCITY
                 field = value
+                writeVelocity(value)
             }
         }
 
@@ -204,36 +195,22 @@ abstract class KMotorController : KBasicMotorController() {
     var linearVelocitySetpoint: LinearVelocity = 0.metersPerSecond
         set(value) {
             if (!encoderConfigured || !linearConfigured) {
-                logError("Cannot set linear velocity without a configured encoder and radius")
+                logError("Cannot set linear velocity without a defined radius")
             } else {
                 field = value
                 velocitySetpoint = value.toAngularVelocity(radius!!)
             }
         }
 
-    /**
-     * Internal update method, computes feedback and sets it to motor controller & followers
-     */
-    override fun update() {
+    protected abstract fun writePid(p: Double, i: Double, d: Double)
 
-        // perform PID computations
-        when (closedLoopMode) {
-            ClosedLoopMode.POSITION -> {
-                val output = pidController.calculate(position.rotations, positionSetpoint.rotations)
-                set(output * 12.0 + feedForward)
-            }
-            ClosedLoopMode.VELOCITY -> {
-                val output = pidController.calculate(velocity.rpm, velocitySetpoint.rpm)
-                set(output * 12.0 + feedForward)
-            }
-            else -> {
-                // don't use PID
-                set(percentOutput * 12 + feedForward)
-            }
-        }
+    protected abstract fun writePosition(position: Angle)
 
-        updateFollowers()
-    }
+    protected abstract fun writeVelocity(vel: AngularVelocity)
+
+    protected abstract fun readPosition(): Angle
+
+    protected abstract fun readVelocity(): AngularVelocity
 
     /**
      * Resets the encoder's position to zero
