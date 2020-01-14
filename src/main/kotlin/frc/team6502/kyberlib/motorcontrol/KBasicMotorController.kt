@@ -2,6 +2,8 @@ package frc.team6502.kyberlib.motorcontrol
 
 import edu.wpi.first.wpilibj.DriverStation
 import edu.wpi.first.wpilibj.Notifier
+import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.RobotController
 import frc.team6502.kyberlib.math.invertIf
 import java.util.function.DoubleSupplier
 
@@ -44,6 +46,16 @@ abstract class KBasicMotorController {
         set(value) {
             field = value
             writePercent(value)
+        }
+
+    /**
+     * Sets controller voltage directly
+     */
+    var voltage: Double = 0.0
+        set(value) {
+            field = value
+            val vbus = if(RobotBase.isReal()) RobotController.getBatteryVoltage() else 12.0
+            writePercent(value / vbus)
         }
 
     /**
