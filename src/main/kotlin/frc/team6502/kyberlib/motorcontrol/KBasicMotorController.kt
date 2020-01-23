@@ -54,7 +54,7 @@ abstract class KBasicMotorController {
     var voltage: Double = 0.0
         set(value) {
             field = value
-            val vbus = if(RobotBase.isReal()) RobotController.getBatteryVoltage() else 12.0
+            val vbus = if (RobotBase.isReal()) RobotController.getBatteryVoltage() else 12.0
             writePercent(value / vbus)
         }
 
