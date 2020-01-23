@@ -6,11 +6,11 @@ import frc.team6502.kyberlib.input.KAxis
 import frc.team6502.kyberlib.input.KController
 
 class KXboxController(port: Int) : KController(port) {
-    val leftX = KAxis { joystick.getX(GenericHID.Hand.kLeft) }
-    val leftY = KAxis { joystick.getY(GenericHID.Hand.kLeft) }
+    val leftX = KAxis { joystick.getRawAxis(0) }
+    val leftY = KAxis { joystick.getRawAxis(1) }
 
-    val rightX = KAxis { joystick.getX(GenericHID.Hand.kRight) }
-    val rightY = KAxis { joystick.getY(GenericHID.Hand.kRight) }
+    val rightX = KAxis{ joystick.getRawAxis(4) }
+    val rightY = KAxis{ joystick.getRawAxis(5) }
 
     val aButton = JoystickButton(joystick, 0)
     val bButton = JoystickButton(joystick, 1)

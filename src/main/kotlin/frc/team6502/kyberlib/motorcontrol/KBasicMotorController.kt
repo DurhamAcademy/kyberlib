@@ -99,8 +99,8 @@ abstract class KBasicMotorController {
 
     protected fun updateFollowers() {
         for (follower in followers) {
-            follower.percentOutput = appliedOutput.invertIf { follower.reversed }
-            follower.update()
+            // follower.percentOutput = appliedOutput.invertIf { follower.reversed }
+            // follower.update()
         }
     }
 
