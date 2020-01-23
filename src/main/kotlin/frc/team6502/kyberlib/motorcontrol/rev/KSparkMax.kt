@@ -73,6 +73,11 @@ class KSparkMax(val canId: CANId, val motorType: frc.team6502.kyberlib.motorcont
         _spark.set(value + (feedForward?.asDouble?.div(RobotController.getBatteryVoltage()) ?: 0.0))
     }
 
+    override fun writeMultipler(mv: Double, mp: Double) {
+        _enc?.velocityConversionFactor = mv
+        _enc?.positionConversionFactor = mp
+    }
+
     override fun readPercent(): Double = _spark.appliedOutput
 
     override fun writeReversed(reversed: Boolean) {

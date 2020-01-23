@@ -38,6 +38,10 @@ class KSimulatedESC(val name: String, apply: KSimulatedESC.() -> Unit = {}) : KM
         posController.d = d
     }
 
+    override fun writeMultipler(mv: Double, mp: Double) {
+
+    }
+
     override fun writePosition(position: Angle) {
         pos = position
         vel = 0.rpm

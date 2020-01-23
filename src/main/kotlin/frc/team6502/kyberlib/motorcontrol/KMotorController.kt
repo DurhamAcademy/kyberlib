@@ -61,6 +61,18 @@ abstract class KMotorController : KBasicMotorController() {
             }
         }
 
+    var velocityMultipler = 1.0
+        set(value) {
+            field = value
+            writeMultipler(velocityMultipler, positionMultipler)
+        }
+
+    var positionMultipler = 1.0
+        set(value) {
+            field = value
+            writeMultipler(velocityMultipler, positionMultipler)
+        }
+
     /**
      * Defines the relationship between rotation and linear motion for the motor.
      */
@@ -129,7 +141,7 @@ abstract class KMotorController : KBasicMotorController() {
                 logError("Cannot get linear position without a defined radius")
                 return 0.feet
             }
-            return readPosition().toCircumference(radius!!) / gearRatio
+            return position.toCircumference(radius!!)
         }
         set(value) {
             linearPositionSetpoint = value
@@ -153,7 +165,7 @@ abstract class KMotorController : KBasicMotorController() {
                 logError("Cannot get linear velocity without a defined radius")
                 return 0.feetPerSecond
             }
-            return readVelocity().toTangentialVelocity(radius!!)
+            return velocity.toTangentialVelocity(radius!!)
         }
         set(value) {
             linearVelocitySetpoint = value
@@ -212,6 +224,8 @@ abstract class KMotorController : KBasicMotorController() {
         }
 
     protected abstract fun writePid(p: Double, i: Double, d: Double)
+
+    protected abstract fun writeMultipler(mv: Double, mp: Double)
 
     protected abstract fun writePosition(position: Angle)
 
