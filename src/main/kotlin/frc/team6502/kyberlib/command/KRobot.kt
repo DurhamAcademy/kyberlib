@@ -10,6 +10,9 @@ import frc.team6502.kyberlib.diagnostics.Diagnostics
 
 open class KRobot(private val period: Double = 0.02) {
 
+    var enabled = false
+        private set
+
     private inner class KRobotInternal : TimedRobot(period) {
 
         override fun robotInit() {
@@ -26,6 +29,7 @@ open class KRobot(private val period: Double = 0.02) {
         override fun disabledInit() {
             Diagnostics.singleton?.cancel()
             Diagnostics.singleton = null
+            enabled = false
             this@KRobot.disabledInit()
         }
 
@@ -34,6 +38,8 @@ open class KRobot(private val period: Double = 0.02) {
         }
 
         override fun autonomousInit() {
+            if (!enabled) enabledInit()
+            enabled = true
             this@KRobot.autonomousInit()
         }
 
@@ -42,6 +48,8 @@ open class KRobot(private val period: Double = 0.02) {
         }
 
         override fun teleopInit() {
+            if (!enabled) enabledInit()
+            enabled = true
             this@KRobot.teleopInit()
         }
 
@@ -82,6 +90,11 @@ open class KRobot(private val period: Double = 0.02) {
      * Ran continuously when the robot is disabled
      */
     open fun disabledPeriodic() {}
+
+    /**
+     * Ran once when robot enters auto or teleop, but not both
+     */
+    open fun enabledInit() {}
 
     /**
      * Ran once when the robot enters autonomous mode
