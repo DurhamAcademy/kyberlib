@@ -12,8 +12,8 @@ class KXboxController(port: Int) : KController(port) {
     val rightX = KAxis{ joystick.getRawAxis(4) }
     val rightY = KAxis{ joystick.getRawAxis(5) }
 
-    val aButton = JoystickButton(joystick, 0)
-    val bButton = JoystickButton(joystick, 1)
-    val xButton = JoystickButton(joystick, 2)
-    val yButton = JoystickButton(joystick, 3)
+    val aButton = JoystickButton(joystick, 1)
+    val bButton = JoystickButton(joystick, 2)
+    val xButton = JoystickButton(joystick, 3)
+    val yButton = JoystickButton(joystick, 4)
 }
