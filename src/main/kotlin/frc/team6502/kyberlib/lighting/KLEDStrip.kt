@@ -31,7 +31,9 @@ class KLEDStrip(port: Int, private val length: Int) {
 
     fun update() {
         val buffer = AddressableLEDBuffer(length)
-        val mutableBuffer = KLEDRegion.composite(length, ticks, regions)
+        val mutableBuffer = KLEDRegion.composite(length, ticks, regions).map {
+            it.gammaCorrect()
+        }
 
         for (i in mutableBuffer.indices) {
             buffer.setLED(i, Color8Bit(mutableBuffer[i].red, mutableBuffer[i].green, mutableBuffer[i].blue))
